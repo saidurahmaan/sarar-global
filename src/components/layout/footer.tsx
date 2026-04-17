@@ -172,7 +172,14 @@ export async function Footer() {
         <p className="mt-12 text-center text-sm text-neutral-500">
           © {year} {store.store_name || common("brand")}. {t("copyright")}{" "}
           <span className="text-neutral-400">|</span> {t("developedBy")}{" "}
-          <span className="font-semibold text-neutral-600">{t("developerName")}</span>
+          <a
+            href="https://mushfikurahmaan.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-semibold text-neutral-600 underline-offset-2 transition-colors hover:text-neutral-900 hover:underline"
+          >
+            {t("developerName")}
+          </a>
         </p>
       </PageContainer>
     </footer>
