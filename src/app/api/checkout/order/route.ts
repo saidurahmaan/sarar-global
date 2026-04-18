@@ -12,15 +12,25 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const body = (await request.json()) as PaperbaseOrderCreateRequest;
+    const body = (await request.json()) as PaperbaseOrderCreateRequest & {
+      payment_method?: "cod" | "mfs";
+    };
     console.info("[checkout/order]", { ip });
-    if (!body?.shipping_zone_public_id || !body.shipping_name || !body.phone || !body.shipping_address) {
+    const { payment_method: _paymentMethod, ...orderPayload } = body;
+    if (
+      _paymentMethod != null &&
+      _paymentMethod !== "cod" &&
+      _paymentMethod !== "mfs"
+    ) {
+      return Response.json({ detail: "Invalid payment method." }, { status: 400 });
+    }
+    if (!orderPayload?.shipping_zone_public_id || !orderPayload.shipping_name || !orderPayload.phone || !orderPayload.shipping_address) {
       return Response.json({ detail: "Missing required order fields." }, { status: 400 });
     }
-    if (!body.products || !Array.isArray(body.products) || body.products.length === 0) {
+    if (!orderPayload.products || !Array.isArray(orderPayload.products) || orderPayload.products.length === 0) {
       return Response.json({ detail: "No products provided." }, { status: 400 });
     }
-    const order = await createOrder(body);
+    const order = await createOrder(orderPayload);
     return Response.json(order, { status: 201 });
   } catch (error) {
     if (error instanceof SyntaxError) {

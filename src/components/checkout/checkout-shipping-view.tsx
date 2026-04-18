@@ -11,14 +11,29 @@ import { resolveStorefrontImageUrl, storefrontImageUnoptimized } from "@/lib/sto
 import { triggerInitiateCheckout } from "@/lib/tracker";
 import { cn } from "@/lib/utils";
 import { Link, useRouter, type Locale } from "@/i18n/routing";
+import type { CartItem } from "@/types/cart";
 import type { PaperbaseShippingOption, PaperbaseShippingZone } from "@/types/paperbase";
+import type { ProductPrepaymentType } from "@/types/product";
+
+import {
+  CHECKOUT_DRAFT_STORAGE_KEY,
+  CHECKOUT_PREPAYMENT_STORAGE_KEY,
+} from "./checkout-storage-keys";
+
+function resolvePrepayment(items: CartItem[]): ProductPrepaymentType {
+  let result: ProductPrepaymentType = "none";
+  for (const item of items) {
+    const kind = item.prepayment_type ?? "none";
+    if (kind === "full") return "full";
+    if (kind === "delivery_only") result = "delivery_only";
+  }
+  return result;
+}
 
 import { QuantityStepper } from "@/components/ui/quantity-stepper";
 
 import { CheckoutBreadcrumbs } from "./checkout-breadcrumbs";
 import { CheckoutLineVariants } from "./checkout-line-variants";
-
-const CHECKOUT_DRAFT_STORAGE_KEY = "paperbase-checkout-draft";
 
 type CheckoutDraft = {
   shipping_zone_public_id: string;
@@ -201,6 +216,12 @@ export function CheckoutShippingView() {
       products: cartItems,
     };
     window.sessionStorage.setItem(CHECKOUT_DRAFT_STORAGE_KEY, JSON.stringify(draft));
+    // Pin the resolved prepayment for this order BEFORE clearing the Buy Now map,
+    // so the payment step can reflect it even after the transient cart source is gone.
+    window.sessionStorage.setItem(
+      CHECKOUT_PREPAYMENT_STORAGE_KEY,
+      resolvePrepayment(checkoutItems),
+    );
     // Buy Now session is captured in the draft — release the temporary map
     clearBuyNow();
     router.push("/checkout/payment");
@@ -496,7 +517,7 @@ export function CheckoutShippingView() {
                       className={cn(
                         "flex cursor-pointer items-center gap-3 rounded-lg border p-4 transition-colors",
                         selected
-                          ? "border-neutral-950 bg-white ring-1 ring-neutral-950"
+                          ? "border-neutral-200 bg-primary/10"
                           : "border-neutral-200 bg-white hover:border-neutral-300",
                       )}
                     >
@@ -506,7 +527,7 @@ export function CheckoutShippingView() {
                         value={zone.zone_public_id}
                         checked={selected}
                         onChange={() => setSelectedZone(zone.zone_public_id)}
-                        className="size-4 shrink-0 accent-blue-600"
+                        className="size-4 shrink-0 accent-primary"
                       />
                       <span className="text-sm font-medium text-neutral-950">{zone.name}</span>
                     </label>

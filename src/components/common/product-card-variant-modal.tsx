@@ -61,6 +61,7 @@ function VariantPicker({ detail, onAdded }: PickerProps) {
         variant_details: selectedVariant.options
           .map((o) => `${o.attribute_name}: ${o.value}`)
           .join(", "),
+        prepayment_type: detail.prepayment_type ?? "none",
       },
       1,
     );

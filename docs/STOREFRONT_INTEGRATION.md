@@ -64,6 +64,7 @@ Add this script tag to **every page** (including product pages and checkout):
 
 Ensure your publishable key is available as **one** of:
 - `window.PAPERBASE_PUBLISHABLE_KEY = "ak_pk_...";`, or
+- `window.__PAPERBASE_API_KEY__ = "ak_pk_...";`, or
 - call `tracker.init({ apiKey: "ak_pk_..." })`
 
 Optional debug mode:
@@ -146,7 +147,9 @@ Store owners must NOT:
 | GET    | `/api/v1/shipping/zones/`            | Shipping zones with cost rules |
 | GET    | `/api/v1/shipping/options/`          | Shipping methods for a zone    |
 | POST   | `/api/v1/shipping/preview/`          | Server-side shipping quote     |
+| POST   | `/api/v1/orders/initiate-checkout/`  | Signal checkout start          |
 | POST   | `/api/v1/orders/`                    | Create order                   |
+| POST   | `/api/v1/orders/<public_id>/payment/`| Submit transaction for prepayment |
 | POST   | `/api/v1/pricing/preview/`           | Single-product pricing preview |
 | POST   | `/api/v1/pricing/breakdown/`         | Full-cart pricing breakdown    |
 | GET    | `/api/v1/search/`                    | Combined product + category search |
@@ -845,14 +848,14 @@ Server-side shipping cost quote.
 
 ---
 
-### 6.14 Checkout start tracking (no API endpoint)
+### 6.14 POST `/api/v1/orders/initiate-checkout/`
 
-Paperbase does **not** provide an `initiate-checkout` orders API endpoint.
+Signal that the customer has entered the checkout page. Fires a server-side analytics event. Body can be empty `{}`.
 
-To track checkout start, call the tracking SDK instead (this sends to `https://api.paperbase.me/tracking/event`):
+**Response `200`:**
 
-```js
-tracker.initiateCheckout(cart);
+```json
+{ "status": "ok" }
 ```
 
 ---
@@ -1220,7 +1223,7 @@ Only `product_public_id`, `variant_public_id`, and `quantity` are sent to the AP
 | 7 | User selects zone | `GET /shipping/options/?zone_public_id=...` |
 | 8 | Recalculate pricing with shipping | `POST /pricing/breakdown/` (with zone + method) |
 | 9 | Customer enters info | No API call |
-| 10 | Enter checkout page | Call `tracker.initiateCheckout(cart)` |
+| 10 | Enter checkout page | `POST /orders/initiate-checkout/` |
 | 11 | Place order | `POST /orders/` |
 | 12 | Show confirmation | Use the `201` response directly |
 
@@ -1256,3 +1259,118 @@ On a `400` with `"detail": "Stock validation failed."`, parse the `errors[]` arr
 | Per IP per minute | 100 | 429 |
 | Per API key per minute | 5000 | 429 |
 | Invalid key attempts | 60/min/key fingerprint | 429 + `Retry-After: 60` |
+
+---
+
+## 14. Prepayment Checkout Flow
+
+Some products require the customer to submit proof of a prior bank/wallet transfer before the store confirms the order. The lifecycle is fully additive — **orders that don't include any prepayment products follow the exact same flow as before** and need no frontend changes.
+
+### 14.1 Product-level field
+
+Product list (`GET /products/`) and detail (`GET /products/<id>/`) responses now include:
+
+```json
+{
+  "public_id": "prd_...",
+  "prepayment_type": "none" | "delivery_only" | "full",
+  "...": "..."
+}
+```
+
+- `none` — no prepayment required (default for legacy products).
+- `delivery_only` — customer must prepay the shipping fee.
+- `full` — customer must prepay the full order total.
+
+Use this to display a badge on PDP, and to decide whether to show a payment form after order creation.
+
+### 14.2 Cart resolution rule (strongest-wins)
+
+If a cart contains a mix of products, the effective prepayment type is the strongest of all items:
+
+`full` > `delivery_only` > `none`
+
+So a cart with one `full` product and two `none` products requires full prepayment. You don't need to compute this client-side — the order creation response always returns the resolved type.
+
+### 14.3 Extended order creation response
+
+`POST /api/v1/orders/` now returns these additional fields alongside the existing receipt body:
+
+```json
+{
+  "public_id": "ord_...",
+  "order_number": "ORD-0001",
+  "status": "pending" | "payment_pending",
+  "payment_status": "none" | "submitted" | "verified" | "failed",
+  "prepayment_type": "none" | "delivery_only" | "full",
+  "requires_payment": false,
+  "transaction_id": null,
+  "payer_number": null,
+  "customer_name": "...",
+  "phone": "...",
+  "shipping_address": "...",
+  "items": [ /* unchanged */ ],
+  "subtotal": "...",
+  "shipping_cost": "...",
+  "total": "..."
+}
+```
+
+Frontend routing rule:
+
+- `requires_payment === false` → show the existing "Order received" success screen.
+- `requires_payment === true` → route to a payment-submission screen using `public_id` and, optionally, the resolved `prepayment_type` to display the amount expected (delivery cost vs. full total).
+
+### 14.4 Submit transaction — `POST /api/v1/orders/<public_id>/payment/`
+
+Called exactly once per order (or again if the previous attempt was rejected).
+
+Request body:
+
+```json
+{
+  "transaction_id": "TRX-9876543210",
+  "payer_number": "01710000000"
+}
+```
+
+Response: same shape as the order creation receipt above, with `payment_status` now `"submitted"` and the submitted `transaction_id` / `payer_number` echoed back.
+
+Error cases:
+
+- `404` — order not found for this API key's store.
+- `400` — missing or blank `transaction_id` / `payer_number`.
+- `400` — order is not in the `payment_pending` status (already confirmed, cancelled, or never required payment).
+- `400` — payment has already been submitted (`payment_status` is `submitted` or `verified`); the customer must wait for admin review. Re-submission is only allowed after `failed`.
+
+### 14.5 Admin verification
+
+After submission the order waits for the store admin to verify via the dashboard. The frontend should poll the order state (via the confirmation page) or instruct the customer to wait for an email — there is no public verification endpoint on the storefront API.
+
+Outcomes observable on the order:
+
+- Verified: `status="confirmed"`, `payment_status="verified"`.
+- Rejected: `status="cancelled"`, `payment_status="failed"` (stock restored; the customer may start a new order).
+
+### 14.6 Lifecycle diagram
+
+```mermaid
+stateDiagram-v2
+    [*] --> pending: prepayment_type == "none"
+    [*] --> payment_pending: prepayment_type != "none"
+    payment_pending --> payment_submitted: POST /orders/{id}/payment/
+    payment_submitted --> confirmed: admin verify valid
+    payment_submitted --> cancelled: admin reject
+    pending --> confirmed: admin /status/
+    pending --> cancelled: admin /status/
+```
+
+`payment_submitted` is a composite state (`status=payment_pending`, `payment_status=submitted`) on a single Order row — it is **not** a new top-level `status` value.
+
+### 14.7 UX checklist
+
+- On PDP, surface a small badge when `prepayment_type !== "none"` so customers know payment will be required at checkout.
+- After `POST /orders/` returns `requires_payment=true`, route to a dedicated screen that collects `transaction_id` and `payer_number`.
+- Validate both fields client-side (non-empty; trim whitespace).
+- Show a clear "waiting for verification" state after the submission succeeds.
+- If `POST /orders/{id}/payment/` returns `400` with "payment has already been submitted", show a non-destructive "already submitted" message instead of treating it as a hard error.

@@ -1,3 +1,5 @@
+export type ProductPrepaymentType = "none" | "delivery_only" | "full";
+
 export type Product = {
   public_id: string;
   name: string;
@@ -13,6 +15,7 @@ export type Product = {
   category_slug: string;
   category_name: string;
   extra_data: Record<string, unknown>;
+  prepayment_type?: ProductPrepaymentType;
 };
 
 export type ProductVariantOption = {

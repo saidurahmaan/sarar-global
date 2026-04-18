@@ -202,6 +202,7 @@ export default async function ProductDetailPage({ params }: PageProps) {
                   stockStatus={product.stock_status}
                   stockTracking={product.stock_tracking}
                   availableQuantity={product.available_quantity}
+                  prepaymentType={product.prepayment_type ?? "none"}
                 />
               </VariantSelectionProvider>
 

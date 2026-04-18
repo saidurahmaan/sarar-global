@@ -15,6 +15,8 @@ import type {
   PaperbaseNotification,
   PaperbaseOrderCreateRequest,
   PaperbaseOrderCreateResponse,
+  PaperbaseOrderReceipt,
+  PaperbasePaymentSubmitRequest,
   PaperbasePricingBreakdownRequest,
   PaperbasePricingBreakdownResponse,
   PaperbasePricingPreviewRequest,
@@ -235,6 +237,15 @@ export function previewShipping(body: PaperbaseShippingPreviewRequest) {
 
 export function createOrder(body: PaperbaseOrderCreateRequest) {
   return paperbasePost<PaperbaseOrderCreateResponse>("orders/", { body });
+}
+
+export function submitOrderPayment(
+  public_id: string,
+  body: PaperbasePaymentSubmitRequest,
+) {
+  return paperbasePost<PaperbaseOrderReceipt>(`orders/${public_id}/payment/`, {
+    body,
+  });
 }
 
 export function pricingPreview(body: PaperbasePricingPreviewRequest) {

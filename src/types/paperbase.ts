@@ -1,5 +1,9 @@
 export type PaperbaseStockStatus = "in_stock" | "low_stock" | "out_of_stock";
 
+export type PaperbaseOrderStatus = "pending" | "payment_pending" | "confirmed" | "cancelled";
+export type PaperbasePaymentStatus = "none" | "submitted" | "verified" | "failed";
+export type PaperbasePrepaymentType = "none" | "delivery_only" | "full";
+
 export type PaginatedResponse<T> = {
   count: number;
   next: string | null;
@@ -71,6 +75,7 @@ export type PaperbaseProductListItem = {
   available_quantity: number;
   variant_count: number;
   extra_data: Record<string, unknown>;
+  prepayment_type?: PaperbasePrepaymentType;
 };
 
 export type PaperbaseProductImage = {
@@ -115,6 +120,7 @@ export type PaperbaseProductDetail = {
   available_quantity: number;
   variants: PaperbaseProductVariant[];
   extra_data: Record<string, unknown>;
+  prepayment_type?: PaperbasePrepaymentType;
 };
 
 export type PaperbaseCategory = {
@@ -257,7 +263,7 @@ export type PaperbaseOrderCreateRequest = {
 export type PaperbaseOrderCreateResponse = {
   public_id: string;
   order_number: string;
-  status: "pending";
+  status: PaperbaseOrderStatus;
   customer_name: string;
   phone: string;
   shipping_address: string;
@@ -271,6 +277,18 @@ export type PaperbaseOrderCreateResponse = {
   subtotal: string;
   shipping_cost: string;
   total: string;
+  payment_status?: PaperbasePaymentStatus;
+  prepayment_type?: PaperbasePrepaymentType;
+  requires_payment?: boolean;
+  transaction_id?: string | null;
+  payer_number?: string | null;
+};
+
+export type PaperbaseOrderReceipt = PaperbaseOrderCreateResponse;
+
+export type PaperbasePaymentSubmitRequest = {
+  transaction_id: string;
+  payer_number: string;
 };
 
 export type PaperbaseCombinedSearchResponse = {

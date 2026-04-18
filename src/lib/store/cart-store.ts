@@ -133,6 +133,7 @@ function mergeItemIntoMap(
         image_url: item.image_url ?? existing.image_url,
         variant_public_id: item.variant_public_id ?? existing.variant_public_id,
         variant_details: item.variant_details ?? existing.variant_details,
+        prepayment_type: item.prepayment_type ?? existing.prepayment_type,
       },
     };
   }

@@ -17,6 +17,7 @@ type ProductDetailBuySectionProps = {
   stockStatus: "in_stock" | "low_stock" | "out_of_stock";
   stockTracking: boolean;
   availableQuantity: number;
+  prepaymentType?: "none" | "delivery_only" | "full";
 };
 
 export function ProductDetailBuySection({
@@ -28,9 +29,11 @@ export function ProductDetailBuySection({
   stockStatus,
   stockTracking,
   availableQuantity,
+  prepaymentType = "none",
 }: ProductDetailBuySectionProps) {
   const t = useTranslations("product");
   const tDetail = useTranslations("productDetail");
+  const tPrepay = useTranslations("prepayment");
   const { addItem, openCartPanel, startBuyNow } = useCart();
   const router = useRouter();
   const { variants, selectedValues, setSelectedValue, selectedVariant, optionsByAttribute } =
@@ -63,6 +66,7 @@ export function ProductDetailBuySection({
       variant_details: selectedVariant
         ? selectedVariant.options.map((opt) => `${opt.attribute_name}: ${opt.value}`).join(", ")
         : undefined,
+      prepayment_type: prepaymentType,
     };
   };
 
@@ -130,6 +134,12 @@ export function ProductDetailBuySection({
           </div>
         </div>
       ))}
+
+      {prepaymentType !== "none" ? (
+        <div className="inline-block w-fit max-w-full rounded-md border border-amber-300 bg-amber-50 px-3 py-2 text-xs font-medium leading-snug text-amber-900">
+          {prepaymentType === "full" ? tPrepay("badgeFull") : tPrepay("badgeDelivery")}
+        </div>
+      ) : null}
 
       {/* Stock status hint */}
       {isLowStock ? (

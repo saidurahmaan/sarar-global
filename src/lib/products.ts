@@ -32,6 +32,7 @@ function mapProduct(item: PaperbaseProductListItem): Product {
     category_slug: item.category_slug,
     category_name: item.category_name,
     extra_data: item.extra_data ?? {},
+    prepayment_type: item.prepayment_type ?? "none",
   };
 }
 
@@ -54,6 +55,7 @@ function mapProductDetail(item: PaperbaseProductDetail): ProductDetail {
     description: item.description,
     images: item.images ?? [],
     variants: item.variants ?? [],
+    prepayment_type: item.prepayment_type ?? "none",
   };
 }
 

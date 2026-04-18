@@ -1,3 +1,5 @@
+import type { ProductPrepaymentType } from "@/types/product";
+
 export type CartItem = {
   product_public_id: string;
   /** Stable React / UI identity for a cart line; preserved when the variant changes on checkout. */
@@ -12,6 +14,11 @@ export type CartItem = {
   price: string;
   image_url: string | null;
   variant_details?: string;
+  /**
+   * Resolved product-level prepayment requirement at the time the item entered the cart.
+   * Falls back to "none" when the persisted cart pre-dates this field.
+   */
+  prepayment_type?: ProductPrepaymentType;
 };
 
 /**
