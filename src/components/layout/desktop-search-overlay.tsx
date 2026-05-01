@@ -31,13 +31,19 @@ export function DesktopSearchOverlay({
       return;
     }
 
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
         setOpen(false);
       }
     };
     document.addEventListener("keydown", onKeyDown);
-    return () => document.removeEventListener("keydown", onKeyDown);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      document.removeEventListener("keydown", onKeyDown);
+    };
   }, [open]);
 
   return (
@@ -55,31 +61,31 @@ export function DesktopSearchOverlay({
 
       {open && isClient
         ? createPortal(
-            <div className="fixed inset-0 z-[120] hidden md:block" role="dialog" aria-modal="true" aria-label={openSearchAriaLabel}>
-              <button
-                type="button"
-                aria-label={closeLabel}
-                className="absolute inset-0 bg-transparent"
-                onClick={() => setOpen(false)}
-              />
-              <div className="absolute inset-x-0 top-[calc(env(safe-area-inset-top,0px)+31px)] flex h-[140px] items-center justify-center border-y border-black/10 bg-[#e9e9e4]">
-                <div className="mx-auto flex w-[min(64rem,calc(100%-3rem))] items-center justify-center gap-2">
-                  <div className="w-[min(40rem,80vw)]">
-                    <StorefrontLiveSearch
-                      mode="desktop"
-                      placeholder={placeholder}
-                      submitAriaLabel={submitAriaLabel}
-                      onAfterNavigate={() => setOpen(false)}
-                    />
-                  </div>
-                  <button
-                    type="button"
-                    aria-label={closeLabel}
-                    onClick={() => setOpen(false)}
-                    className="inline-flex size-9 items-center justify-center rounded-md text-black/60 transition hover:bg-black/5 hover:text-black/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
-                  >
-                    <X className="size-5" aria-hidden />
-                  </button>
+            <div
+              className="fixed inset-0 z-[120] hidden min-h-0 flex-col bg-neutral-100 pt-[env(safe-area-inset-top,0px)] md:flex"
+              role="dialog"
+              aria-modal="true"
+              aria-label={openSearchAriaLabel}
+            >
+              <div className="flex shrink-0 justify-end px-4 pt-3 pb-1">
+                <button
+                  type="button"
+                  onClick={() => setOpen(false)}
+                  aria-label={closeLabel}
+                  className="flex size-11 items-center justify-center rounded-full text-text transition hover:bg-black/[0.04] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+                >
+                  <X className="size-6" strokeWidth={2} aria-hidden />
+                </button>
+              </div>
+
+              <div className="flex min-h-0 flex-1 flex-col px-6 pb-[env(safe-area-inset-bottom,12px)] pt-2">
+                <div className="mx-auto w-full max-w-3xl">
+                  <StorefrontLiveSearch
+                    mode="desktop"
+                    placeholder={placeholder}
+                    submitAriaLabel={submitAriaLabel}
+                    onAfterNavigate={() => setOpen(false)}
+                  />
                 </div>
               </div>
             </div>,

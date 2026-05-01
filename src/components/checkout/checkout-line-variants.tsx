@@ -47,7 +47,7 @@ function VariantSync({
     <div className="mt-3 space-y-3">
       {[...optionsByAttribute.entries()].map(([slug, data]) => (
         <div key={slug}>
-          <p className="mb-2 text-[10px] font-bold uppercase tracking-widest text-primary">
+          <p className="mb-2 text-xs font-bold uppercase tracking-normal text-primary">
             {data.attribute_name}
             {selectedValues[slug] ? (
               <span className="ml-1.5 font-semibold normal-case tracking-normal text-neutral-800">
@@ -106,7 +106,7 @@ function StaticVariantBadges({ item }: { item: CartItem }) {
       {variantPairs.map((pair, idx) => (
         <div key={`${pair.label}-${pair.value}-${idx}`} className="min-w-0">
           {pair.label ? (
-            <p className="text-[10px] font-bold uppercase tracking-widest text-neutral-500">{pair.label}</p>
+            <p className="text-xs font-bold uppercase tracking-normal text-neutral-500">{pair.label}</p>
           ) : null}
           <span className="mt-1 inline-flex rounded bg-neutral-950 px-2.5 py-1 text-xs font-medium text-white">
             {pair.value}

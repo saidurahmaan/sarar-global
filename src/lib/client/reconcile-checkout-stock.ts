@@ -121,15 +121,8 @@ export async function reconcileCheckoutStock(
     }
 
     const nextQty = Math.min(item.quantity, max);
-    const shouldUnsetMax = !detail.stock_tracking && item.max_quantity != null;
-    const nextMax = detail.stock_tracking ? max : undefined;
-    const maxMetaChanged = shouldUnsetMax || (detail.stock_tracking && item.max_quantity !== nextMax);
-
-    if (nextQty !== item.quantity || maxMetaChanged) {
-      opts.setLineQuantity(item.product_public_id, item.variant_public_id, nextQty, opts.scope, {
-        ...(shouldUnsetMax ? { unsetMaxQuantity: true } : {}),
-        ...(detail.stock_tracking ? { max_quantity: nextMax } : {}),
-      });
+    if (nextQty !== item.quantity) {
+      opts.setLineQuantity(item.product_public_id, item.variant_public_id, nextQty, opts.scope);
       changed = true;
     }
   }

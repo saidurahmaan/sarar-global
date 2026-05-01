@@ -7,5 +7,8 @@ import type { PaperbaseStorePublic } from "@/types/paperbase";
  * Do not add custom Meta Pixel / CAPI here.
  */
 export function getTrackerScriptSrc(store: PaperbaseStorePublic): string {
+  if (!store.tracking_enabled) {
+    return "";
+  }
   return store.tracker_script_src ?? "";
 }

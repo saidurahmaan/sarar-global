@@ -291,6 +291,7 @@ export function CheckoutShippingView() {
       if (!selectedZone) {
         return;
       }
+      setSelectedMethod("");
       setLoading(true);
       setErrorText(null);
       try {
@@ -321,7 +322,7 @@ export function CheckoutShippingView() {
   const initiateRequestIdRef = useRef(0);
 
   useEffect(() => {
-    if (loading || !selectedZone) {
+    if (loading || !selectedZone || !selectedMethod) {
       return;
     }
     let mounted = true;
@@ -403,7 +404,7 @@ export function CheckoutShippingView() {
       window.clearTimeout(tid);
       initiateAbortRef.current?.abort();
     };
-  }, [loading, pricingCartKey, selectedZone]);
+  }, [loading, pricingCartKey, selectedMethod, selectedZone]);
 
   const handleIncrement = useCallback(
     (item: CartItem) => {
@@ -530,7 +531,9 @@ export function CheckoutShippingView() {
               "lg:absolute lg:inset-0 lg:overflow-hidden",
             )}
           >
-          <h2 className="shrink-0 text-lg font-semibold tracking-tight text-neutral-950">{t("orderSummary")}</h2>
+          <h2 className="shrink-0 text-xl font-semibold tracking-normal uppercase text-neutral-950">
+            {t("orderSummary")}
+          </h2>
 
           <ul className="checkout-summary-scroll mt-5 space-y-4 max-lg:max-h-[60vh] max-lg:overflow-y-auto max-lg:pr-1 lg:min-h-0 lg:flex-1 lg:overflow-y-auto lg:pr-1">
             {checkoutItems.map((item) => (
@@ -565,7 +568,9 @@ export function CheckoutShippingView() {
 
         <div className="flex min-h-0 min-w-0 flex-col gap-6 lg:h-full">
           <section className={cn("shrink-0", shellCard, "p-5 sm:p-6")}>
-            <h1 className="text-lg font-semibold tracking-tight text-neutral-950">{t("customerInfoTitle")}</h1>
+            <h1 className="text-xl font-semibold tracking-normal uppercase text-neutral-950">
+              {t("customerInfoTitle")}
+            </h1>
             <div className="mt-6 grid gap-5">
               <div className="grid gap-5 sm:grid-cols-2">
                 <label className="grid gap-2">

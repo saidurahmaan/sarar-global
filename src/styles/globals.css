@@ -185,6 +185,13 @@
     @apply border-border outline-ring/50;
   }
 
+  a[href],
+  button:not(:disabled),
+  input:is([type="button"], [type="submit"], [type="reset"]):not(:disabled),
+  [role="button"]:not([aria-disabled="true"]) {
+    cursor: pointer;
+  }
+
   html {
     /* Avoid a thin default-white strip at the viewport edge next to full-bleed headers */
     @apply bg-surface font-sans;

@@ -5,7 +5,7 @@ import { CartPanelHost, CartTrigger } from "@/components/common/cart-drawer-trig
 import { Link } from "@/i18n/routing";
 import { DesktopSearchOverlay } from "@/components/layout/desktop-search-overlay";
 import { DesktopCategoryMegaNav } from "@/components/layout/desktop-category-mega-nav";
-import { DesktopCategoryScrollVisibility } from "@/components/layout/desktop-category-scroll-visibility";
+import { DesktopNavbarScrollVisibility } from "@/components/layout/desktop-navbar-scroll-visibility";
 import { MobileSearchOverlay } from "@/components/layout/mobile-search-overlay";
 import { MobileNavDrawer } from "@/components/layout/mobile-nav-drawer";
 import { PageContainer } from "@/components/layout/page-container";
@@ -35,11 +35,16 @@ export async function Navbar() {
   const { top: brandTop, bottom: brandBottom } = splitBrandName(store.store_name);
 
   return (
-    <header className="relative sticky top-0 z-40 w-full min-w-0 overflow-x-clip bg-header text-white pt-[env(safe-area-inset-top,0px)] ps-[env(safe-area-inset-left,0px)] pe-[env(safe-area-inset-right,0px)]">
+    <>
+      <DesktopNavbarScrollVisibility targetId="storefront-header" />
+      <header
+        id="storefront-header"
+        className="relative sticky top-0 z-40 w-full min-w-0 overflow-x-clip bg-header text-white pt-[env(safe-area-inset-top,0px)] ps-[env(safe-area-inset-left,0px)] pe-[env(safe-area-inset-right,0px)]"
+      >
       {topNotice ? (
         <div className="bg-[#e30613]">
           <PageContainer>
-            <p className="flex items-center justify-center gap-3 py-2 text-center text-[11px] font-medium tracking-normal text-white">
+            <p className="flex items-center justify-center gap-3 py-2.5 text-center text-[13px] font-normal tracking-normal text-white md:py-3 md:text-[14px]">
               {topNotice}
             </p>
           </PageContainer>
@@ -47,7 +52,7 @@ export async function Navbar() {
       ) : null}
 
       <PageContainer>
-        <div className="flex min-h-14 items-center gap-3 py-1.5 md:min-h-20 md:gap-4 md:py-3">
+        <div className="flex min-h-14 items-center gap-3 py-1.5 md:min-h-16 md:gap-4 md:py-2">
           <div className="grid w-full min-w-0 flex-1 grid-cols-[5.5rem_minmax(0,1fr)_5.5rem] items-center gap-2 md:hidden">
             <MobileNavDrawer
               menuTitle={nav("products")}
@@ -105,14 +110,17 @@ export async function Navbar() {
 
       <CartPanelHost />
 
-      <DesktopCategoryScrollVisibility>
+      <div className="hidden h-px w-full bg-white/15 md:block" />
+
+      <div className="hidden md:block">
         <DesktopCategoryMegaNav
           ariaLabel={nav("products")}
           browseEyebrow={nav("products")}
           newBadgeLabel={product("newBadge")}
           categories={categories}
         />
-      </DesktopCategoryScrollVisibility>
-    </header>
+      </div>
+      </header>
+    </>
   );
 }

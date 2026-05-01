@@ -14,7 +14,12 @@ type StorefrontRuntimeBootProps = {
 
 export function StorefrontRuntimeBoot({ publishableKey, trackerSrc }: StorefrontRuntimeBootProps) {
   useEffect(() => {
-    (window as { PAPERBASE_PUBLISHABLE_KEY?: string }).PAPERBASE_PUBLISHABLE_KEY = publishableKey;
+    const runtimeWindow = window as { PAPERBASE_PUBLISHABLE_KEY?: string };
+    if (!publishableKey) {
+      delete runtimeWindow.PAPERBASE_PUBLISHABLE_KEY;
+      return;
+    }
+    runtimeWindow.PAPERBASE_PUBLISHABLE_KEY = publishableKey;
   }, [publishableKey]);
 
   useEffect(() => {

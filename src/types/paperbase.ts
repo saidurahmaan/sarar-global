@@ -23,6 +23,7 @@ export type PaperbaseStorePublic = {
   address: string;
   tracker_build_id?: string;
   tracker_script_src?: string;
+  tracking_enabled?: boolean;
   extra_field_schema: Array<{
     id: string;
     entityType: string;

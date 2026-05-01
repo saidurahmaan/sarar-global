@@ -232,7 +232,7 @@ export function StorefrontLiveSearch({
               "absolute end-2 top-1/2 z-[1] -translate-y-1/2 bg-transparent text-text hover:bg-neutral-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary",
           )}
         >
-          {mode === "desktop" && trimmed.length > 0 ? (
+          {(mode === "desktop" || mode === "mobile") && trimmed.length > 0 ? (
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 24 24"

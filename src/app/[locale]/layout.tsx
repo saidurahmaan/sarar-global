@@ -73,11 +73,12 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
   setRequestLocale(activeLocale);
   const messages = (await import(`../../../messages/${activeLocale}.json`)).default;
   const { publishableKey } = getServerPaperbaseConfig();
-  const trackerSrc = getTrackerScriptSrc(store);
+  const trackerSrc = store.tracking_enabled ? getTrackerScriptSrc(store) : "";
+  const runtimePublishableKey = store.tracking_enabled ? publishableKey : "";
 
   return (
     <>
-      <StorefrontRuntimeBoot publishableKey={publishableKey} trackerSrc={trackerSrc} />
+      <StorefrontRuntimeBoot publishableKey={runtimePublishableKey} trackerSrc={trackerSrc} />
       <NextIntlClientProvider locale={activeLocale} messages={messages}>
         <AosInit />
         <div
