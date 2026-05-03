@@ -36,6 +36,7 @@ export function applyTheme(palette: ResolvedPalette): void {
   Object.entries(palette).forEach(([key, value]) => {
     root.style.setProperty(`--${key}`, value)
   })
+  root.style.removeProperty("background-color")
   const modeHex = palette["header"] ?? palette.background
   root.setAttribute("data-theme-mode", isColorDark(modeHex) ? "dark" : "light")
 }

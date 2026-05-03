@@ -15,7 +15,6 @@ type BannerImageSliderProps = {
   headlineFallback: string;
   images: BannerImageSlide[];
   priority?: boolean;
-  height?: number;
   showTitleOverlay?: boolean;
   viewportClassName?: string;
 };
@@ -27,7 +26,6 @@ export function BannerImageSlider({
   headlineFallback,
   images,
   priority = false,
-  height = 1200,
   showTitleOverlay = false,
   viewportClassName = "h-[220px] sm:h-[280px] md:h-[380px] lg:h-[460px]",
 }: BannerImageSliderProps) {
@@ -44,9 +42,11 @@ export function BannerImageSlider({
   const CROSSFADE_MS = 400;
 
   useEffect(() => {
-    setIndex(0);
-    setPreviousIndex(null);
-    setCrossfadeActive(false);
+    queueMicrotask(() => {
+      setIndex(0);
+      setPreviousIndex(null);
+      setCrossfadeActive(false);
+    });
   }, [slides.length]);
 
   useEffect(() => {

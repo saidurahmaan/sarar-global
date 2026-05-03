@@ -1,0 +1,171 @@
+npm warn Unknown env config "devdir". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+
+/home/mahi/Projects/personal/paperbase/storefront-paperbase/src/app/[locale]/page.tsx
+  148:10  error  Error: Cannot create components during render
+
+Components created during render will reset their state each time they are created. Declare components outside of render.
+
+/home/mahi/Projects/personal/paperbase/storefront-paperbase/src/app/[locale]/page.tsx:148:10
+  146 |
+  147 |       <div className="mt-12 md:mt-16">
+> 148 |         <FullBleedBannerBlock banners={homeBottomBanners} />
+      |          ^^^^^^^^^^^^^^^^^^^^ This component is created during render
+  149 |       </div>
+  150 |     </div>
+  151 |   );
+
+/home/mahi/Projects/personal/paperbase/storefront-paperbase/src/app/[locale]/page.tsx:37:3
+  35 |   const heroSlides = heroBanner ? toBannerSlides(heroBanner) : [];
+  36 |
+> 37 |   function FullBleedBannerBlock({ banners }: { banners: PaperbaseBanner[] }) {
+     |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 38 |     if (banners.length === 0) {
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 39 |       return null;
+     …
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 67 |     );
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 68 |   }
+     | ^^^^ The component is created during render here
+  69 |
+  70 |   return (
+  71 |     <div  react-hooks/static-components
+
+/home/mahi/Projects/personal/paperbase/storefront-paperbase/src/app/layout.tsx
+  55:9  warning  Custom fonts not added in `pages/_document.js` will only load for a single page. This is discouraged. See: https://nextjs.org/docs/messages/no-page-custom-font  @next/next/no-page-custom-font
+
+/home/mahi/Projects/personal/paperbase/storefront-paperbase/src/components/checkout/checkout-line-variants.tsx
+  178:14  warning  Hardcoded color class "bg-neutral-100" found. Use semantic theme tokens instead: bg-background, bg-card, bg-primary, bg-muted, bg-header, text-foreground, text-muted-foreground, text-primary-foreground, text-header-foreground, border-border, ring-ring  local-rules/no-hardcoded-colors
+  180:16  warning  Hardcoded color class "bg-neutral-100" found. Use semantic theme tokens instead: bg-background, bg-card, bg-primary, bg-muted, bg-header, text-foreground, text-muted-foreground, text-primary-foreground, text-header-foreground, border-border, ring-ring  local-rules/no-hardcoded-colors
+  181:16  warning  Hardcoded color class "bg-neutral-100" found. Use semantic theme tokens instead: bg-background, bg-card, bg-primary, bg-muted, bg-header, text-foreground, text-muted-foreground, text-primary-foreground, text-header-foreground, border-border, ring-ring  local-rules/no-hardcoded-colors
+  183:14  warning  Hardcoded color class "bg-neutral-100" found. Use semantic theme tokens instead: bg-background, bg-card, bg-primary, bg-muted, bg-header, text-foreground, text-muted-foreground, text-primary-foreground, text-header-foreground, border-border, ring-ring  local-rules/no-hardcoded-colors
+
+/home/mahi/Projects/personal/paperbase/storefront-paperbase/src/components/checkout/checkout-mfs-payment.tsx
+  221:16  warning  Hardcoded color class "bg-neutral-100" found. Use semantic theme tokens instead: bg-background, bg-card, bg-primary, bg-muted, bg-header, text-foreground, text-muted-foreground, text-primary-foreground, text-header-foreground, border-border, ring-ring      local-rules/no-hardcoded-colors
+  222:16  warning  Hardcoded color class "bg-neutral-100" found. Use semantic theme tokens instead: bg-background, bg-card, bg-primary, bg-muted, bg-header, text-foreground, text-muted-foreground, text-primary-foreground, text-header-foreground, border-border, ring-ring      local-rules/no-hardcoded-colors
+  225:20  warning  Hardcoded color class "bg-neutral-100" found. Use semantic theme tokens instead: bg-background, bg-card, bg-primary, bg-muted, bg-header, text-foreground, text-muted-foreground, text-primary-foreground, text-header-foreground, border-border, ring-ring      local-rules/no-hardcoded-colors
+  226:20  warning  Hardcoded color class "border-neutral-200" found. Use semantic theme tokens instead: bg-background, bg-card, bg-primary, bg-muted, bg-header, text-foreground, text-muted-foreground, text-primary-foreground, text-header-foreground, border-border, ring-ring  local-rules/no-hardcoded-colors
+  226:20  warning  Hardcoded color class "bg-neutral-50" found. Use semantic theme tokens instead: bg-background, bg-card, bg-primary, bg-muted, bg-header, text-foreground, text-muted-foreground, text-primary-foreground, text-header-foreground, border-border, ring-ring       local-rules/no-hardcoded-colors
+  229:20  warning  Hardcoded color class "bg-neutral-100" found. Use semantic theme tokens instead: bg-background, bg-card, bg-primary, bg-muted, bg-header, text-foreground, text-muted-foreground, text-primary-foreground, text-header-foreground, border-border, ring-ring      local-rules/no-hardcoded-colors
+  230:20  warning  Hardcoded color class "border-neutral-200" found. Use semantic theme tokens instead: bg-background, bg-card, bg-primary, bg-muted, bg-header, text-foreground, text-muted-foreground, text-primary-foreground, text-header-foreground, border-border, ring-ring  local-rules/no-hardcoded-colors
+  230:20  warning  Hardcoded color class "bg-neutral-50" found. Use semantic theme tokens instead: bg-background, bg-card, bg-primary, bg-muted, bg-header, text-foreground, text-muted-foreground, text-primary-foreground, text-header-foreground, border-border, ring-ring       local-rules/no-hardcoded-colors
+
+/home/mahi/Projects/personal/paperbase/storefront-paperbase/src/components/checkout/checkout-order-success.tsx
+   40:17  warning  Hardcoded color class "bg-neutral-100" found. Use semantic theme tokens instead: bg-background, bg-card, bg-primary, bg-muted, bg-header, text-foreground, text-muted-foreground, text-primary-foreground, text-header-foreground, border-border, ring-ring  local-rules/no-hardcoded-colors
+  114:6   warning  React Hook useEffect has a missing dependency: 'waitForInvoice'. Either include it or remove the dependency array                                                                                                                                            react-hooks/exhaustive-deps
+
+/home/mahi/Projects/personal/paperbase/storefront-paperbase/src/components/checkout/checkout-shipping-view.tsx
+  181:9  warning  'tCart' is assigned a value but never used                                                                     @typescript-eslint/no-unused-vars
+  183:9  warning  'productT' is assigned a value but never used                                                                  @typescript-eslint/no-unused-vars
+  255:6  warning  React Hook useEffect has a missing dependency: 'finalTotal'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+/home/mahi/Projects/personal/paperbase/storefront-paperbase/src/components/checkout/checkout-success-page-client.tsx
+  41:5   error    Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/home/mahi/Projects/personal/paperbase/storefront-paperbase/src/components/checkout/checkout-success-page-client.tsx:41:5
+  39 |       meta?.payment_method ?? (order.requires_payment === true ? "mfs" : "cod");
+  40 |     const mfsProvider = meta?.mfs_provider ?? null;
+> 41 |     setModel({ order, paymentMethod, mfsProvider });
+     |     ^^^^^^^^ Avoid calling setState() directly within an effect
+  42 |   }, [orderId, router]);
+  43 |
+  44 |   if (model === undefined) {  react-hooks/set-state-in-effect
+  48:16  warning  Hardcoded color class "bg-neutral-100" found. Use semantic theme tokens instead: bg-background, bg-card, bg-primary, bg-muted, bg-header, text-foreground, text-muted-foreground, text-primary-foreground, text-header-foreground, border-border, ring-ring                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    local-rules/no-hardcoded-colors
+  49:16  warning  Hardcoded color class "bg-neutral-100" found. Use semantic theme tokens instead: bg-background, bg-card, bg-primary, bg-muted, bg-header, text-foreground, text-muted-foreground, text-primary-foreground, text-header-foreground, border-border, ring-ring                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    local-rules/no-hardcoded-colors
+
+/home/mahi/Projects/personal/paperbase/storefront-paperbase/src/components/common/add-to-cart-dialog.tsx
+  38:9  warning  'locale' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/home/mahi/Projects/personal/paperbase/storefront-paperbase/src/components/common/product-card-variant-modal.tsx
+  222:14  warning  Hardcoded color class "bg-neutral-100" found. Use semantic theme tokens instead: bg-background, bg-card, bg-primary, bg-muted, bg-header, text-foreground, text-muted-foreground, text-primary-foreground, text-header-foreground, border-border, ring-ring                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 local-rules/no-hardcoded-colors
+  224:16  warning  Hardcoded color class "bg-neutral-100" found. Use semantic theme tokens instead: bg-background, bg-card, bg-primary, bg-muted, bg-header, text-foreground, text-muted-foreground, text-primary-foreground, text-header-foreground, border-border, ring-ring                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 local-rules/no-hardcoded-colors
+  225:16  warning  Hardcoded color class "bg-neutral-100" found. Use semantic theme tokens instead: bg-background, bg-card, bg-primary, bg-muted, bg-header, text-foreground, text-muted-foreground, text-primary-foreground, text-header-foreground, border-border, ring-ring                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 local-rules/no-hardcoded-colors
+  229:14  warning  Hardcoded color class "bg-neutral-100" found. Use semantic theme tokens instead: bg-background, bg-card, bg-primary, bg-muted, bg-header, text-foreground, text-muted-foreground, text-primary-foreground, text-header-foreground, border-border, ring-ring                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 local-rules/no-hardcoded-colors
+  232:26  warning  Hardcoded color class "bg-neutral-100" found. Use semantic theme tokens instead: bg-background, bg-card, bg-primary, bg-muted, bg-header, text-foreground, text-muted-foreground, text-primary-foreground, text-header-foreground, border-border, ring-ring                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 local-rules/no-hardcoded-colors
+  236:12  warning  Hardcoded color class "bg-neutral-100" found. Use semantic theme tokens instead: bg-background, bg-card, bg-primary, bg-muted, bg-header, text-foreground, text-muted-foreground, text-primary-foreground, text-header-foreground, border-border, ring-ring                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 local-rules/no-hardcoded-colors
+  305:9   error    Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/home/mahi/Projects/personal/paperbase/storefront-paperbase/src/components/common/product-card-variant-modal.tsx:305:9
+  303 |     if (open) {
+  304 |       if (Array.isArray(product.variants) && product.variants.length > 0) {
+> 305 |         setDetail({
+      |         ^^^^^^^^^ Avoid calling setState() directly within an effect
+  306 |           public_id: product.public_id,
+  307 |           name: product.name,
+  308 |           slug: product.slug,  react-hooks/set-state-in-effect
+
+/home/mahi/Projects/personal/paperbase/storefront-paperbase/src/components/layout/desktop-navbar-scroll-visibility.tsx
+  51:9  warning  Expected an assignment or function call and instead saw an expression  @typescript-eslint/no-unused-expressions
+
+/home/mahi/Projects/personal/paperbase/storefront-paperbase/src/components/layout/desktop-search-overlay.tsx
+  75:19  warning  Hardcoded color class "hover:bg-black/[0.04]" found. Use semantic theme tokens instead: bg-background, bg-card, bg-primary, bg-muted, bg-header, text-foreground, text-muted-foreground, text-primary-foreground, text-header-foreground, border-border, ring-ring  local-rules/no-hardcoded-colors
+
+/home/mahi/Projects/personal/paperbase/storefront-paperbase/src/components/layout/mobile-search-overlay.tsx
+  98:19  warning  Hardcoded color class "hover:bg-black/[0.04]" found. Use semantic theme tokens instead: bg-background, bg-card, bg-primary, bg-muted, bg-header, text-foreground, text-muted-foreground, text-primary-foreground, text-header-foreground, border-border, ring-ring  local-rules/no-hardcoded-colors
+
+/home/mahi/Projects/personal/paperbase/storefront-paperbase/src/components/layout/navbar.tsx
+  35:16  warning  'brandTop' is assigned a value but never used     @typescript-eslint/no-unused-vars
+  35:34  warning  'brandBottom' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/home/mahi/Projects/personal/paperbase/storefront-paperbase/src/components/marketing/banner-image-slider.tsx
+   30:3  warning  'height' is assigned a value but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   @typescript-eslint/no-unused-vars
+   47:5  error    Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/home/mahi/Projects/personal/paperbase/storefront-paperbase/src/components/marketing/banner-image-slider.tsx:47:5
+  45 |
+  46 |   useEffect(() => {
+> 47 |     setIndex(0);
+     |     ^^^^^^^^ Avoid calling setState() directly within an effect
+  48 |     setPreviousIndex(null);
+  49 |     setCrossfadeActive(false);
+  50 |   }, [slides.length]);  react-hooks/set-state-in-effect
+  108:6  warning  React Hook useEffect has a missing dependency: 'goTo'. Either include it or remove the dependency array                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       react-hooks/exhaustive-deps
+
+/home/mahi/Projects/personal/paperbase/storefront-paperbase/src/components/marketing/global-promo-popup.tsx
+  45:5  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/home/mahi/Projects/personal/paperbase/storefront-paperbase/src/components/marketing/global-promo-popup.tsx:45:5
+  43 |
+  44 |   useEffect(() => {
+> 45 |     setOpen(false);
+     |     ^^^^^^^ Avoid calling setState() directly within an effect
+  46 |     if (!shouldShowOnCurrentPage || !popup) return;
+  47 |
+  48 |     const baseKey = `store_popup_${popup.public_id}`;  react-hooks/set-state-in-effect
+
+/home/mahi/Projects/personal/paperbase/storefront-paperbase/src/lib/paperbase-public.ts
+  22:70  warning  'rewriteOrigin' is defined but never used  @typescript-eslint/no-unused-vars
+
+/home/mahi/Projects/personal/paperbase/storefront-paperbase/src/lib/products.ts
+  129:61  warning  '_page' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/home/mahi/Projects/personal/paperbase/storefront-paperbase/src/lib/store/cart-store.ts
+  328:29  warning  '_drop' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+✖ 42 problems (5 errors, 37 warnings)
+

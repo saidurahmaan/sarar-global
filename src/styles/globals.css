@@ -241,7 +241,7 @@
   }
 
   .btn-accent {
-    @apply bg-accent text-primary hover:bg-accent/90;
+    @apply bg-accent text-accent-foreground hover:bg-accent/90;
   }
 
   .price-text {
@@ -270,7 +270,7 @@
   }
 
   .price-display-discount-pill {
-    @apply inline-flex items-center rounded-sm bg-accent px-2.5 py-1 text-sm font-bold tabular-nums tracking-tight text-primary;
+    @apply inline-flex items-center rounded-sm bg-accent px-2.5 py-1 text-sm font-bold tabular-nums tracking-tight text-accent-foreground;
   }
 
   .price-display-card {
@@ -303,7 +303,7 @@
   }
 
   .flash-sale {
-    @apply rounded-sm bg-accent px-2.5 py-1 text-xs font-semibold text-primary;
+    @apply rounded-sm bg-accent px-2.5 py-1 text-xs font-semibold text-accent-foreground;
   }
 
   /** Horizontal category nav: thin thumb, transparent track (WebKit + Firefox) */

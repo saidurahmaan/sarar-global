@@ -71,7 +71,7 @@ export async function Footer() {
   const year = new Date().getFullYear();
 
   const socialClass =
-    "flex size-11 items-center justify-center rounded-md border border-primary-foreground/15 bg-primary-foreground/5 text-primary-foreground transition-colors hover:border-accent/50 hover:bg-primary-foreground/10 hover:text-accent";
+    "flex size-11 items-center justify-center rounded-md border border-primary-foreground/15 bg-primary-foreground/5 text-primary-foreground transition-colors hover:border-accent/50 hover:bg-primary-foreground/10 hover:opacity-70";
 
   const socials = [
     {
@@ -127,7 +127,7 @@ export async function Footer() {
                     {t("emailLabel")}
                   </p>
                   <a
-                    className="mt-0.5 block text-sm text-primary-foreground/80 underline-offset-2 hover:text-accent hover:underline"
+                    className="mt-0.5 block text-sm text-primary-foreground/80 underline-offset-2 hover:opacity-70 hover:underline"
                     href={`mailto:${store.support_email || t("emailLine")}`}
                   >
                     {store.support_email || t("emailLine")}
@@ -141,7 +141,7 @@ export async function Footer() {
                     {t("phoneLabel")}
                   </p>
                   <a
-                    className="mt-0.5 block text-sm text-primary-foreground/80 underline-offset-2 hover:text-accent hover:underline"
+                    className="mt-0.5 block text-sm text-primary-foreground/80 underline-offset-2 hover:opacity-70 hover:underline"
                     href={`tel:${store.phone.replace(/\s/g, "")}`}
                   >
                     {store.phone}
@@ -157,17 +157,17 @@ export async function Footer() {
             </h2>
             <ul className="list-none space-y-2.5 p-0">
               <li>
-                <Link href="/account" className="text-sm text-primary-foreground/85 underline-offset-2 hover:text-accent hover:underline">
+                <Link href="/account" className="text-sm text-primary-foreground/85 underline-offset-2 hover:opacity-70 hover:underline">
                   {t("customerAccount")}
                 </Link>
               </li>
               <li>
-                <Link href="/wishlist" className="text-sm text-primary-foreground/85 underline-offset-2 hover:text-accent hover:underline">
+                <Link href="/wishlist" className="text-sm text-primary-foreground/85 underline-offset-2 hover:opacity-70 hover:underline">
                   {t("customerWishlist")}
                 </Link>
               </li>
               <li>
-                <Link href="/blog" className="text-sm text-primary-foreground/85 underline-offset-2 hover:text-accent hover:underline">
+                <Link href="/blog" className="text-sm text-primary-foreground/85 underline-offset-2 hover:opacity-70 hover:underline">
                   {t("customerBlog")}
                 </Link>
               </li>
@@ -176,35 +176,35 @@ export async function Footer() {
 
           <div>
             <h2 className="mb-5 text-sm font-bold uppercase tracking-wide text-primary-foreground">
-              <Link href="/information" className="underline-offset-4 hover:text-accent hover:underline">
+              <Link href="/information" className="underline-offset-4 hover:opacity-70 hover:underline">
                 {t("information")}
               </Link>
             </h2>
             <ul className="list-none space-y-2.5 p-0">
               <li>
-                <Link href="/about-us" className="text-sm text-primary-foreground/85 underline-offset-2 hover:text-accent hover:underline">
+                <Link href="/about-us" className="text-sm text-primary-foreground/85 underline-offset-2 hover:opacity-70 hover:underline">
                   {t("infoAbout")}
                 </Link>
               </li>
               <li>
-                <Link href="/contact-us" className="text-sm text-primary-foreground/85 underline-offset-2 hover:text-accent hover:underline">
+                <Link href="/contact-us" className="text-sm text-primary-foreground/85 underline-offset-2 hover:opacity-70 hover:underline">
                   {t("infoContact")}
                 </Link>
               </li>
               <li>
-                <Link href="/privacy-policy" className="text-sm text-primary-foreground/85 underline-offset-2 hover:text-accent hover:underline">
+                <Link href="/privacy-policy" className="text-sm text-primary-foreground/85 underline-offset-2 hover:opacity-70 hover:underline">
                   {t("infoPrivacy")}
                 </Link>
               </li>
               <li>
-                <Link href="/return-refund" className="text-sm text-primary-foreground/85 underline-offset-2 hover:text-accent hover:underline">
+                <Link href="/return-refund" className="text-sm text-primary-foreground/85 underline-offset-2 hover:opacity-70 hover:underline">
                   {t("infoReturns")}
                 </Link>
               </li>
               <li>
                 <Link
                   href="/cancellation-policy"
-                  className="text-sm text-primary-foreground/85 underline-offset-2 hover:text-accent hover:underline"
+                  className="text-sm text-primary-foreground/85 underline-offset-2 hover:opacity-70 hover:underline"
                 >
                   {t("infoCancellation")}
                 </Link>

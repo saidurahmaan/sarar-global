@@ -4,7 +4,6 @@ import "@/styles/globals.css";
 import "aos/dist/aos.css";
 import { Geist } from "next/font/google";
 import { ThemeProvider } from "@/lib/theme/ThemeProvider";
-import { THEME_CACHE_VERSION, THEME_LS_KEY, THEME_LS_VERSION_KEY } from "@/lib/theme/themeCacheKeys";
 import { cn } from "@/lib/utils";
 
 const geist = Geist({ subsets: ["latin"], variable: "--font-sans", preload: false });
@@ -22,27 +21,27 @@ export default function RootLayout({ children }: RootLayoutProps) {
           dangerouslySetInnerHTML={{
             __html: `
         try {
-          const v = localStorage.getItem('${THEME_LS_VERSION_KEY}');
-          const t = localStorage.getItem('${THEME_LS_KEY}');
-          if (v === '${THEME_CACHE_VERSION}' && t) {
+          const t = localStorage.getItem('sf_theme_cache');
+          if (t) {
             const p = JSON.parse(t).resolved_palette;
-            const r = document.documentElement;
-            Object.entries(p).forEach(([k, val]) => {
-              r.style.setProperty('--' + k, val);
-            });
-            var headerBg = p['header'] || p['background'];
-            if (headerBg && typeof headerBg === 'string') {
-              var hex = headerBg.trim();
-              if (hex.charAt(0) === '#') hex = hex.slice(1);
-              if (hex.length === 3 && /^[0-9a-fA-F]{3}$/.test(hex)) {
-                hex = hex.charAt(0)+hex.charAt(0)+hex.charAt(1)+hex.charAt(1)+hex.charAt(2)+hex.charAt(2);
+            if (p && typeof p === 'object') {
+              const r = document.documentElement;
+              Object.entries(p).forEach(([k, v]) => {
+                r.style.setProperty('--' + k, v);
+              });
+              var pageBg = p['background'];
+              if (pageBg && typeof pageBg === 'string') {
+                r.style.backgroundColor = pageBg;
               }
-              if (hex.length === 6 && /^[0-9a-fA-F]{6}$/.test(hex)) {
-                var r0 = parseInt(hex.slice(0,2), 16);
-                var g0 = parseInt(hex.slice(2,4), 16);
-                var b0 = parseInt(hex.slice(4,6), 16);
-                var lum = (0.299*r0 + 0.587*g0 + 0.114*b0)/255;
-                r.setAttribute('data-theme-mode', lum < 0.5 ? 'dark' : 'light');
+              var headerBg = p['header'] || p['background'];
+              if (headerBg) {
+                var rgb = parseInt(headerBg.slice(1),16);
+                var r2=rgb>>16, g=rgb>>8&255, b=rgb&255;
+                var lum=(0.299*r2+0.587*g+0.114*b)/255;
+                document.documentElement.setAttribute(
+                  'data-theme-mode',
+                  lum<0.5?'dark':'light'
+                );
               }
             }
           }

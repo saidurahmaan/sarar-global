@@ -42,7 +42,9 @@ export function GlobalPromoPopup({ popup }: { popup: PaperbaseStorePopup | null 
   const shouldShowOnCurrentPage = Boolean(popup && (popup.show_on_all_pages || isHomePage));
 
   useEffect(() => {
-    setOpen(false);
+    queueMicrotask(() => {
+      setOpen(false);
+    });
     if (!shouldShowOnCurrentPage || !popup) return;
 
     const baseKey = `store_popup_${popup.public_id}`;

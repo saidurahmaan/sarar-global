@@ -16,3 +16,22 @@ export function categoryDisplayName(name: string): string {
   }
   return left;
 }
+
+/**
+ * Optional body line under a nav heading (API `description`): strips `… in …` like {@link categoryDisplayName}.
+ * Returns null when empty or when it only repeats the short label (avoids “Tees” + “Tees in Men”).
+ */
+export function categoryNavBlurb(label: string, rawDescription?: string | null): string | null {
+  if (typeof rawDescription !== "string" || !rawDescription.trim()) {
+    return null;
+  }
+  const display = categoryDisplayName(rawDescription).trim();
+  if (!display) {
+    return null;
+  }
+  const l = label.trim().toLowerCase();
+  if (l.length > 0 && display.toLowerCase() === l) {
+    return null;
+  }
+  return display;
+}

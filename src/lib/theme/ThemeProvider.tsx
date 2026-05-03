@@ -5,33 +5,32 @@ import useSWR from "swr";
 
 import { ThemeContext, type ThemeConfig } from "./ThemeContext";
 import { applyTheme } from "./applyTheme";
-import { THEME_CACHE_VERSION, THEME_LS_KEY, THEME_LS_VERSION_KEY } from "./themeCacheKeys";
+import { THEME_LS_KEY, THEME_LS_VERSION_KEY } from "./themeCacheKeys";
 
 export const STOREFRONT_THEME_SWR_KEY = "/api/v1/theming";
 
-type ThemeApiResponse = {
-  palette: string;
-  resolved_palette: ThemeConfig["resolved_palette"];
-};
-
-function readLocalFallback(): ThemeApiResponse | undefined {
+function readLocalFallback(): ThemeConfig | undefined {
   if (typeof window === "undefined") return undefined;
   try {
-    const cached = localStorage.getItem(THEME_LS_KEY);
-    const version = localStorage.getItem(THEME_LS_VERSION_KEY);
-    if (version !== THEME_CACHE_VERSION) {
-      localStorage.removeItem(THEME_LS_KEY);
-      localStorage.removeItem(THEME_LS_VERSION_KEY);
+    const stored = localStorage.getItem(THEME_LS_KEY);
+    const storedVersion = localStorage.getItem(THEME_LS_VERSION_KEY);
+    if (!stored || !storedVersion) return undefined;
+    const parsed = JSON.parse(stored) as ThemeConfig;
+    if (
+      !parsed.palette_version ||
+      typeof parsed.palette_version !== "string" ||
+      parsed.palette_version !== storedVersion
+    ) {
       return undefined;
     }
-    if (!cached) return undefined;
-    return JSON.parse(cached) as ThemeApiResponse;
+    if (!parsed.palette || !parsed.resolved_palette) return undefined;
+    return parsed;
   } catch {
     return undefined;
   }
 }
 
-async function fetchTheme(): Promise<ThemeApiResponse> {
+async function fetchTheme(): Promise<ThemeConfig> {
   const res = await fetch(STOREFRONT_THEME_SWR_KEY, {
     headers: { Accept: "application/json" },
     cache: "no-store",
@@ -40,7 +39,7 @@ async function fetchTheme(): Promise<ThemeApiResponse> {
     const text = await res.text();
     throw new Error(text || `theme_fetch_${res.status}`);
   }
-  return res.json() as Promise<ThemeApiResponse>;
+  return res.json() as Promise<ThemeConfig>;
 }
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
@@ -56,23 +55,25 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   });
 
   const themeValue: ThemeConfig | null = useMemo(() => {
-    if (!data?.palette || !data?.resolved_palette) return null;
+    if (!data?.palette || !data?.palette_version || !data?.resolved_palette) return null;
     return {
       palette: data.palette,
+      palette_version: data.palette_version,
       resolved_palette: data.resolved_palette,
     };
   }, [data]);
 
   useEffect(() => {
-    if (data) {
+    if (data?.resolved_palette) {
+      applyTheme(data.resolved_palette);
       try {
-        localStorage.setItem(THEME_LS_KEY, JSON.stringify(data));
-        localStorage.setItem(THEME_LS_VERSION_KEY, THEME_CACHE_VERSION);
+        const storedVersion = localStorage.getItem(THEME_LS_VERSION_KEY);
+        if (storedVersion !== data.palette_version) {
+          localStorage.setItem(THEME_LS_KEY, JSON.stringify(data));
+          localStorage.setItem(THEME_LS_VERSION_KEY, data.palette_version);
+        }
       } catch {
         /* ignore quota */
-      }
-      if (data.resolved_palette) {
-        applyTheme(data.resolved_palette);
       }
       return;
     }

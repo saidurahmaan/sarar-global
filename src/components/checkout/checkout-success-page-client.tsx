@@ -38,15 +38,17 @@ export function CheckoutSuccessPageClient({ orderId }: Props) {
     const paymentMethod =
       meta?.payment_method ?? (order.requires_payment === true ? "mfs" : "cod");
     const mfsProvider = meta?.mfs_provider ?? null;
-    setModel({ order, paymentMethod, mfsProvider });
+    queueMicrotask(() => {
+      setModel({ order, paymentMethod, mfsProvider });
+    });
   }, [orderId, router]);
 
   if (model === undefined) {
     return (
       <div className="bg-card pb-12 pt-6 md:pb-16 md:pt-8">
         <div className="mx-auto max-w-xl px-4 md:px-6">
-          <div className="mx-auto h-64 max-w-xs animate-pulse rounded-lg bg-neutral-100" />
-          <div className="mx-auto mt-8 h-8 max-w-sm animate-pulse rounded-md bg-neutral-100" />
+          <div className="mx-auto h-64 max-w-xs animate-pulse rounded-lg bg-muted" />
+          <div className="mx-auto mt-8 h-8 max-w-sm animate-pulse rounded-md bg-muted" />
         </div>
       </div>
     );

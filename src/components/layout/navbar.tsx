@@ -42,9 +42,9 @@ export async function Navbar() {
         className="relative sticky top-0 z-40 w-full min-w-0 bg-header text-header-foreground pt-[env(safe-area-inset-top,0px)] ps-[env(safe-area-inset-left,0px)] pe-[env(safe-area-inset-right,0px)]"
       >
       {topNotice ? (
-        <div className="bg-accent text-primary">
+        <div className="bg-accent text-accent-foreground">
           <PageContainer>
-            <p className="flex items-center justify-center gap-2 py-1.5 text-center text-[14px] font-medium leading-[1.12] tracking-normal text-primary md:py-2 md:text-[15px]">
+            <p className="flex items-center justify-center gap-2 py-1.5 text-center text-[14px] font-medium leading-[1.12] tracking-normal text-accent-foreground md:py-2 md:text-[15px]">
               {topNotice}
             </p>
           </PageContainer>

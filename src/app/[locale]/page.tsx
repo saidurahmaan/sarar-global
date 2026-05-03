@@ -10,6 +10,58 @@ import { getStorefrontHomeCategorySections } from "@/lib/products";
 import { getStorefrontBanners } from "@/lib/storefront";
 import type { PaperbaseBanner } from "@/types/paperbase";
 
+function bannerHasAnyImage(banner: PaperbaseBanner) {
+  return Boolean(banner.image_url) || banner.images.some((item) => Boolean(item.image_url));
+}
+
+function toBannerSlides(banner: PaperbaseBanner) {
+  const fromApiImages = banner.images.filter((item) => Boolean(item.image_url));
+  if (fromApiImages.length > 0) {
+    return fromApiImages;
+  }
+  return banner.image_url
+    ? [{ public_id: banner.public_id, image_url: banner.image_url, order: 0 }]
+    : [];
+}
+
+function FullBleedBannerBlock({
+  banners,
+  headlineFallback,
+}: {
+  banners: PaperbaseBanner[];
+  headlineFallback: string;
+}) {
+  if (banners.length === 0) {
+    return null;
+  }
+
+  return (
+    <div className="w-full space-y-6 md:space-y-8">
+      {banners.map((banner) => (
+        <section key={banner.public_id} className="w-full">
+          {bannerHasAnyImage(banner) ? (
+            <div className="relative w-full">
+              <BannerImageSlider
+                title={banner.title}
+                headlineFallback={headlineFallback}
+                images={toBannerSlides(banner)}
+                viewportClassName="h-[230px] sm:h-[320px] md:h-screen"
+                showTitleOverlay={Boolean(banner.title?.trim())}
+              />
+            </div>
+          ) : (
+            <PageContainer>
+              <div className="card mx-auto max-w-4xl px-4 py-6 text-center md:px-6">
+                <p className="text-pretty text-base font-semibold leading-snug text-foreground md:text-lg">{banner.title}</p>
+              </div>
+            </PageContainer>
+          )}
+        </section>
+      ))}
+    </div>
+  );
+}
+
 export default async function HomePage() {
   const [tHome, categorySections, homeTopBanners, homeBottomBanners, locale] = await Promise.all([
     getTranslations("home"),
@@ -18,54 +70,10 @@ export default async function HomePage() {
     getStorefrontBanners("home_bottom"),
     getLocale(),
   ]);
-  const bannerHasAnyImage = (banner: PaperbaseBanner) =>
-    Boolean(banner.image_url) || banner.images.some((item) => Boolean(item.image_url));
-  const toBannerSlides = (banner: PaperbaseBanner) => {
-    const fromApiImages = banner.images.filter((item) => Boolean(item.image_url));
-    if (fromApiImages.length > 0) {
-      return fromApiImages;
-    }
-    return banner.image_url
-      ? [{ public_id: banner.public_id, image_url: banner.image_url, order: 0 }]
-      : [];
-  };
 
   const heroBanner = homeTopBanners.find((banner) => bannerHasAnyImage(banner)) ?? null;
   const hasBottomBanners = homeBottomBanners.length > 0;
   const heroSlides = heroBanner ? toBannerSlides(heroBanner) : [];
-
-  function FullBleedBannerBlock({ banners }: { banners: PaperbaseBanner[] }) {
-    if (banners.length === 0) {
-      return null;
-    }
-
-    return (
-      <div className="w-full space-y-6 md:space-y-8">
-        {banners.map((banner) => (
-          <section key={banner.public_id} className="w-full">
-            {bannerHasAnyImage(banner) ? (
-              <div className="relative w-full">
-                <BannerImageSlider
-                  title={banner.title}
-                  headlineFallback={tHome("headline")}
-                  images={toBannerSlides(banner)}
-                  height={1200}
-                  viewportClassName="h-[230px] sm:h-[320px] md:h-screen"
-                  showTitleOverlay={Boolean(banner.title?.trim())}
-                />
-              </div>
-            ) : (
-              <PageContainer>
-                <div className="card mx-auto max-w-4xl px-4 py-6 text-center md:px-6">
-                  <p className="text-pretty text-base font-semibold leading-snug text-foreground md:text-lg">{banner.title}</p>
-                </div>
-              </PageContainer>
-            )}
-          </section>
-        ))}
-      </div>
-    );
-  }
 
   return (
     <div
@@ -79,7 +87,6 @@ export default async function HomePage() {
               headlineFallback={tHome("headline")}
               images={heroSlides}
               priority
-              height={1200}
               viewportClassName="h-[230px] sm:h-[320px] md:h-screen"
             />
           ) : (
@@ -145,7 +152,7 @@ export default async function HomePage() {
       </PageContainer>
 
       <div className="mt-12 md:mt-16">
-        <FullBleedBannerBlock banners={homeBottomBanners} />
+        <FullBleedBannerBlock banners={homeBottomBanners} headlineFallback={tHome("headline")} />
       </div>
     </div>
   );

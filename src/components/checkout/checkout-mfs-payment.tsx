@@ -218,16 +218,16 @@ export function CheckoutMfsPayment() {
       <div className="bg-card pb-12 pt-6 md:pb-16 md:pt-8">
         <CheckoutBreadcrumbs step="mfsProvider" />
         <div className="mx-auto max-w-xl rounded-lg border border-border bg-card p-8 shadow-sm md:p-10">
-          <div className="h-8 max-w-xs animate-pulse rounded-md bg-neutral-100" />
-          <div className="mt-4 h-4 max-w-md animate-pulse rounded-md bg-neutral-100" />
+          <div className="h-8 max-w-xs animate-pulse rounded-md bg-muted" />
+          <div className="mt-4 h-4 max-w-md animate-pulse rounded-md bg-muted" />
           <div className="mt-8 grid gap-8">
             <div className="space-y-2">
-              <div className="h-4 w-32 animate-pulse rounded bg-neutral-100" />
-              <div className="h-24 animate-pulse rounded-lg border border-neutral-200 bg-neutral-50" />
+              <div className="h-4 w-32 animate-pulse rounded bg-muted" />
+              <div className="h-24 animate-pulse rounded-lg border border-border bg-background" />
             </div>
             <div className="space-y-2">
-              <div className="h-4 w-32 animate-pulse rounded bg-neutral-100" />
-              <div className="h-24 animate-pulse rounded-lg border border-neutral-200 bg-neutral-50" />
+              <div className="h-4 w-32 animate-pulse rounded bg-muted" />
+              <div className="h-24 animate-pulse rounded-lg border border-border bg-background" />
             </div>
           </div>
         </div>
@@ -318,10 +318,10 @@ export function CheckoutMfsPayment() {
             className="border-y-2 border-accent/60 bg-accent/15 px-4 py-4 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.35)] md:px-6"
             aria-labelledby={sendMoneySectionId}
           >
-            <h2 id={sendMoneySectionId} className="text-base font-bold tracking-tight text-primary">
+            <h2 id={sendMoneySectionId} className="text-base font-bold tracking-tight text-accent-foreground">
               {sendMoneyTitle}
             </h2>
-            <p className="mt-2 text-sm font-medium leading-relaxed text-primary/90">{sendMoneyBody}</p>
+            <p className="mt-2 text-sm font-medium leading-relaxed text-accent-foreground/90">{sendMoneyBody}</p>
             <div className="mt-3 flex min-h-[3.25rem] items-center gap-2 rounded-lg border border-accent/45 bg-card px-3 py-2.5 shadow-sm">
               <p className="min-w-0 flex-1 text-xl font-bold tabular-nums leading-tight text-foreground sm:text-2xl">
                 {instructionPhone}
@@ -331,7 +331,7 @@ export function CheckoutMfsPayment() {
                 onClick={() => void copyStoreNumberToClipboard()}
                 disabled={storeInfoLoading || !storePublic?.phone?.trim()}
                 className={cn(
-                  "inline-flex shrink-0 items-center justify-center rounded-lg border border-accent/40 bg-accent/20 px-2.5 py-2 text-primary transition-colors",
+                  "inline-flex shrink-0 items-center justify-center rounded-lg border border-accent/40 bg-accent/20 px-2.5 py-2 text-accent-foreground transition-colors",
                   "hover:bg-accent/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40",
                   "disabled:pointer-events-none disabled:opacity-40",
                 )}
@@ -420,7 +420,7 @@ export function CheckoutMfsPayment() {
           />
 
           {errorText ? (
-            <p className="border-t border-border bg-accent/10 px-4 py-2 text-center text-sm text-primary md:px-6">
+            <p className="border-t border-border bg-accent/10 px-4 py-2 text-center text-sm text-accent-foreground md:px-6">
               {errorText}
             </p>
           ) : null}

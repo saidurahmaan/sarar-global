@@ -219,21 +219,21 @@ function VariantPickerSkeleton() {
   return (
     <div className="animate-pulse space-y-5">
       <div className="flex items-center gap-3">
-        <div className="h-16 w-16 shrink-0 rounded-lg bg-neutral-100" />
+        <div className="h-16 w-16 shrink-0 rounded-lg bg-muted" />
         <div className="flex-1 space-y-2">
-          <div className="h-3.5 w-3/4 rounded bg-neutral-100" />
-          <div className="h-3 w-1/3 rounded bg-neutral-100" />
+          <div className="h-3.5 w-3/4 rounded bg-muted" />
+          <div className="h-3 w-1/3 rounded bg-muted" />
         </div>
       </div>
       <div className="space-y-3">
-        <div className="h-3 w-1/4 rounded bg-neutral-100" />
+        <div className="h-3 w-1/4 rounded bg-muted" />
         <div className="flex gap-2">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="h-9 w-16 rounded-md bg-neutral-100" />
+            <div key={i} className="h-9 w-16 rounded-md bg-muted" />
           ))}
         </div>
       </div>
-      <div className="h-12 rounded-md bg-neutral-100" />
+      <div className="h-12 rounded-md bg-muted" />
     </div>
   );
 }
@@ -300,7 +300,8 @@ export function ProductCardVariantModal({ product, variant = "default" }: Props)
   }, [product]);
 
   useEffect(() => {
-    if (open) {
+    if (!open) return;
+    queueMicrotask(() => {
       if (Array.isArray(product.variants) && product.variants.length > 0) {
         setDetail({
           public_id: product.public_id,
@@ -330,8 +331,8 @@ export function ProductCardVariantModal({ product, variant = "default" }: Props)
         setDetail(seeded);
         return;
       }
-      fetchDetail();
-    }
+      void fetchDetail();
+    });
   }, [open, fetchDetail, product]);
 
   return (

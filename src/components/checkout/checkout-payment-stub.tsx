@@ -255,9 +255,9 @@ export function CheckoutPaymentStub() {
         <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{t("paymentStubBody")}</p>
 
         {requiresPrepayment ? (
-          <div className="mt-5 rounded-md border border-accent/40 bg-accent/15 px-4 py-3 text-sm text-primary">
+          <div className="mt-5 rounded-md border border-accent/40 bg-accent/15 px-4 py-3 text-sm text-accent-foreground">
             <p className="font-semibold">{t("prepaymentRequiredTitle")}</p>
-            <p className="mt-1 text-primary/80">
+            <p className="mt-1 text-accent-foreground/80">
               {resolvedPrepayment === "full"
                 ? t("prepaymentRequiredFullBody")
                 : t("prepaymentRequiredDeliveryBody")}
@@ -333,7 +333,7 @@ export function CheckoutPaymentStub() {
                           </span>
                         ) : null}
                         {requiresPrepayment && option.id === "mfs" ? (
-                          <span className="inline-flex shrink-0 rounded-md bg-accent/20 px-2 py-0.5 text-xs font-semibold text-primary">
+                          <span className="inline-flex shrink-0 rounded-md bg-accent/20 px-2 py-0.5 text-xs font-semibold text-accent-foreground">
                             {t("paymentMfsPrepayBadge")}
                           </span>
                         ) : null}

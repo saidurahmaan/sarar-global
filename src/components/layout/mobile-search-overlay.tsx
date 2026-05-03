@@ -95,7 +95,7 @@ export function MobileSearchOverlay({
                   type="button"
                   onClick={() => setOpen(false)}
                   aria-label={closeLabel}
-                  className="flex size-11 items-center justify-center rounded-md text-foreground transition hover:bg-black/[0.04] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+                  className="flex size-11 items-center justify-center rounded-md text-foreground transition hover:bg-muted focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
                 >
                   <X className="size-6" strokeWidth={2} aria-hidden />
                 </button>

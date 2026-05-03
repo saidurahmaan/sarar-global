@@ -175,12 +175,12 @@ export function CheckoutLineVariants({ item }: { item: CartItem }) {
   if (loading) {
     return (
       <div className="mt-3 space-y-3 animate-pulse" aria-busy="true">
-        <div className="h-3 w-16 rounded bg-neutral-100" />
+        <div className="h-3 w-16 rounded bg-muted" />
         <div className="flex gap-2">
-          <div className="h-9 w-14 rounded-md bg-neutral-100" />
-          <div className="h-9 w-14 rounded-md bg-neutral-100" />
+          <div className="h-9 w-14 rounded-md bg-muted" />
+          <div className="h-9 w-14 rounded-md bg-muted" />
         </div>
-        <div className="h-3 w-40 rounded bg-neutral-100" />
+        <div className="h-3 w-40 rounded bg-muted" />
       </div>
     );
   }

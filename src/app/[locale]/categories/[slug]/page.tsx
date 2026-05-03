@@ -29,7 +29,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
   const hasProducts = products.results.length > 0;
 
   return (
-    <div className="bg-card pt-4 pb-8 md:pt-6 md:pb-10">
+    <div className="flex flex-1 flex-col bg-card pt-4 pb-8 md:pt-6 md:pb-10">
       <PageContainer>
         <header className="mx-auto max-w-4xl px-1 text-center">
           <h1 className="text-pretty text-2xl font-light tracking-tight text-foreground md:text-3xl lg:text-4xl">

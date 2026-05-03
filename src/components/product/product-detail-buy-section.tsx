@@ -181,7 +181,7 @@ export function ProductDetailBuySection({
       ))}
 
       {prepaymentType !== "none" ? (
-        <div className="inline-block w-fit max-w-full rounded-md border border-accent/40 bg-accent/15 px-3 py-2 text-xs font-medium leading-snug text-primary">
+        <div className="inline-block w-fit max-w-full rounded-md border border-accent/40 bg-accent/15 px-3 py-2 text-xs font-medium leading-snug text-accent-foreground">
           {prepaymentType === "full" ? tPrepay("badgeFull") : tPrepay("badgeDelivery")}
         </div>
       ) : null}

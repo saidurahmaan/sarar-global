@@ -6,7 +6,9 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "lint:theme": "eslint src/ --rule '{\"local-rules/no-hardcoded-colors\": \"warn\"}'",
+    "lint:theme:strict": "eslint src/ --rule '{\"local-rules/no-hardcoded-colors\": \"error\"}'"
   },
   "dependencies": {
     "aos": "^2.3.4",
@@ -34,6 +36,7 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.2.4",
+    "eslint-plugin-tailwindcss": "^3.18.3",
     "tailwindcss": "^4.2.2",
     "typescript": "^5"
   }

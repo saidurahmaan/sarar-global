@@ -37,7 +37,7 @@ function CheckoutSuccessLottie() {
   }, []);
 
   if (!animationData) {
-    return <div className="mx-auto size-64 max-w-full animate-pulse rounded-lg bg-neutral-100" />;
+    return <div className="mx-auto size-64 max-w-full animate-pulse rounded-lg bg-muted" />;
   }
 
   return (

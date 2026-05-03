@@ -31,7 +31,7 @@ export function CartTrigger({ variant }: CartTriggerProps) {
       <Link href="/cart">
         <span className="relative inline-flex">
           <Handbag className="size-[26px] shrink-0" strokeWidth={1.75} aria-hidden />
-          <span className="absolute -bottom-0.5 -right-0.5 flex h-[18px] min-w-[18px] translate-x-px translate-y-px items-center justify-center rounded-full bg-accent px-1 text-[10px] font-semibold leading-none text-primary tabular-nums">
+          <span className="absolute -bottom-0.5 -right-0.5 flex h-[18px] min-w-[18px] translate-x-px translate-y-px items-center justify-center rounded-full bg-accent px-1 text-[10px] font-semibold leading-none text-accent-foreground tabular-nums">
             {itemCount > 99 ? "99+" : itemCount}
           </span>
         </span>
@@ -93,7 +93,7 @@ export function MobileFloatingCartButton() {
     >
       <span className="relative inline-flex">
         <Handbag className="size-7 shrink-0" strokeWidth={2} aria-hidden />
-        <span className="absolute -bottom-1 -right-1 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-accent px-1 text-[10px] font-semibold leading-none text-primary tabular-nums">
+        <span className="absolute -bottom-1 -right-1 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-accent px-1 text-[10px] font-semibold leading-none text-accent-foreground tabular-nums">
           {itemCount > 99 ? "99+" : itemCount}
         </span>
       </span>

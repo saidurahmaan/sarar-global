@@ -84,12 +84,12 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
         <AosInit />
         <div
           lang={activeLocale}
-          className={`${poppins.variable} ${notoSansBengali.variable} flex min-h-screen flex-col bg-background ${activeLocale === "bn" ? "font-sans-bn" : "font-sans-en"}`}
+          className={`${poppins.variable} ${notoSansBengali.variable} flex min-h-screen flex-col bg-card ${activeLocale === "bn" ? "font-sans-bn" : "font-sans-en"}`}
         >
           <GlobalPromoPopup popup={popup} />
           <AddToCartDialogHost />
           <Navbar />
-          <main className="flex min-h-0 flex-1 flex-col">{children}</main>
+          <main className="flex min-h-0 flex-1 flex-col bg-card">{children}</main>
           <Footer />
         </div>
       </NextIntlClientProvider>

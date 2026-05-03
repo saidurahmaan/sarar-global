@@ -6,6 +6,7 @@ import { useCallback, useEffect, useId, useRef, useState, type ReactNode } from 
 import { Badge } from "@/components/ui/badge";
 import { PageContainer } from "@/components/layout/page-container";
 import { Link } from "@/i18n/routing";
+import { categoryNavBlurb } from "@/lib/category-display";
 import type { HeaderCategoryNav } from "@/lib/storefront";
 import { cn } from "@/lib/utils";
 
@@ -153,7 +154,8 @@ export function DesktopCategoryMegaNav({
                 <li
                   key={category.id}
                   className={cn(
-                    "group flex min-h-9 shrink-0 items-stretch rounded-md hover:bg-card focus-within:bg-card",
+                    "group flex min-h-9 shrink-0 items-stretch rounded-md",
+                    expandable && "hover:bg-card focus-within:bg-card",
                     isOpen &&
                       expandable &&
                       "relative z-[35] -my-2 rounded-none bg-card py-2 !shadow-none ring-0",
@@ -186,8 +188,7 @@ export function DesktopCategoryMegaNav({
                       className={cn(
                         categoryBarLinkClass,
                         "text-header-foreground/90 transition-[color,text-decoration-color]",
-                        "underline decoration-transparent decoration-1 underline-offset-8 group-hover:text-card-foreground group-hover:decoration-card-foreground/50",
-                        "group-focus-within:text-card-foreground group-focus-within:decoration-card-foreground/50",
+                        "underline decoration-transparent decoration-1 underline-offset-8 hover:text-header-foreground hover:decoration-header-foreground/50",
                         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30",
                       )}
                     >
@@ -219,7 +220,6 @@ export function DesktopCategoryMegaNav({
                 <div className="flex flex-col gap-4 border-b border-border pb-4 sm:flex-row sm:items-end sm:justify-between">
                   <div className="min-w-0 space-y-1">
                     <p className="text-[11px] font-normal tracking-wide text-muted-foreground uppercase">{browseEyebrow}</p>
-                    <p className="text-lg font-normal tracking-tight text-foreground sm:text-xl">{active.label}</p>
                   </div>
                   <NavHref
                     href={active.href}
@@ -230,30 +230,33 @@ export function DesktopCategoryMegaNav({
                 </div>
 
                 <div className="mt-6 grid gap-8 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3">
-                  {activeChildren.map((item) => (
-                    <section key={item.id} className="min-w-0">
-                      <NavHref
-                        href={item.href}
-                        className="block w-fit pb-3 text-base font-normal uppercase tracking-wide text-foreground underline decoration-foreground/50 underline-offset-4 outline-none focus-visible:ring-2 focus-visible:ring-primary/25 focus-visible:ring-offset-2"
-                      >
-                        <span className="inline-flex flex-wrap items-center gap-2">
-                          {item.label}
-                          {item.isNew ? (
-                            <Badge className="bg-success px-2 py-0.5 text-[10px] font-normal tracking-wide text-white">
-                              {newBadgeLabel}
-                            </Badge>
-                          ) : null}
-                        </span>
-                      </NavHref>
-                      {item.children?.length ? (
-                        <div className="pt-1">
-                          <CategoryNavFlatStack items={item.children} />
-                        </div>
-                      ) : item.description ? (
-                        <p className="mt-3 text-sm leading-snug text-muted-foreground">{item.description}</p>
-                      ) : null}
-                    </section>
-                  ))}
+                  {activeChildren.map((item) => {
+                    const blurb = categoryNavBlurb(item.label, item.description);
+                    return (
+                      <section key={item.id} className="min-w-0">
+                        <NavHref
+                          href={item.href}
+                          className="block w-fit pb-3 text-base font-normal uppercase tracking-wide text-foreground underline decoration-foreground/50 underline-offset-4 outline-none focus-visible:ring-2 focus-visible:ring-primary/25 focus-visible:ring-offset-2"
+                        >
+                          <span className="inline-flex flex-wrap items-center gap-2">
+                            {item.label}
+                            {item.isNew ? (
+                              <Badge className="bg-success px-2 py-0.5 text-[10px] font-normal tracking-wide text-white">
+                                {newBadgeLabel}
+                              </Badge>
+                            ) : null}
+                          </span>
+                        </NavHref>
+                        {item.children?.length ? (
+                          <div className="pt-1">
+                            <CategoryNavFlatStack items={item.children} />
+                          </div>
+                        ) : blurb ? (
+                          <p className="mt-3 text-sm leading-snug text-muted-foreground">{blurb}</p>
+                        ) : null}
+                      </section>
+                    );
+                  })}
                 </div>
               </div>
             </div>

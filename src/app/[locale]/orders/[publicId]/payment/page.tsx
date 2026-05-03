@@ -33,7 +33,7 @@ export default async function OrderPaymentPage({ params }: PageProps) {
   setRequestLocale(locale);
 
   return (
-    <div className="min-h-screen overflow-x-clip bg-background">
+    <div className="min-h-screen overflow-x-clip bg-card">
       <PageContainer>
         <OrderPaymentView publicId={publicId} />
       </PageContainer>
