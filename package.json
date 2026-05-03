@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "lint:theme": "eslint src/ --rule '{\"local-rules/no-hardcoded-colors\": \"warn\"}'",
-    "lint:theme:strict": "eslint src/ --rule '{\"local-rules/no-hardcoded-colors\": \"error\"}'"
+    "lint:theme:strict": "eslint src/ --rule '{\"local-rules/no-hardcoded-colors\": \"error\"}'",
+    "warm-cache": "npx tsx scripts/warm-cache.ts"
   },
   "dependencies": {
     "aos": "^2.3.4",
@@ -38,6 +39,7 @@
     "eslint-config-next": "16.2.4",
     "eslint-plugin-tailwindcss": "^3.18.3",
     "tailwindcss": "^4.2.2",
+    "tsx": "^4.19.0",
     "typescript": "^5"
   }
 }

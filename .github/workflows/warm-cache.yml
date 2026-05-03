@@ -1,0 +1,30 @@
+# Required GitHub Secrets:
+# - NEXT_PUBLIC_SITE_URL      → your production storefront URL
+# - PAPERBASE_API_URL         → your Paperbase API base URL
+# - PAPERBASE_PUBLISHABLE_KEY → your storefront publishable key
+
+name: Warm Cache After Deploy
+
+on:
+  deployment_status:
+
+jobs:
+  warm:
+    if: github.event.deployment_status.state == 'success' && github.event.deployment_status.environment == 'Production'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      - run: npm run warm-cache
+        env:
+          NEXT_PUBLIC_SITE_URL: ${{ secrets.NEXT_PUBLIC_SITE_URL }}
+          PAPERBASE_API_URL: ${{ secrets.PAPERBASE_API_URL }}
+          PAPERBASE_PUBLISHABLE_KEY: ${{ secrets.PAPERBASE_PUBLISHABLE_KEY }}
