@@ -61,6 +61,78 @@ const nextConfig: NextConfig = {
   images: {
     remotePatterns: buildRemotePatterns(),
   },
+  async headers() {
+    return [
+      // -------------------------------------------------------
+      // 1. Static JS/CSS bundles — cache forever (hash-based)
+      // -------------------------------------------------------
+      {
+        source: "/_next/static/:path*",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=31536000, immutable",
+          },
+        ],
+      },
+
+      // -------------------------------------------------------
+      // 2. Next.js optimized images
+      // -------------------------------------------------------
+      {
+        source: "/_next/image:path*",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=31536000, immutable",
+          },
+        ],
+      },
+
+      // -------------------------------------------------------
+      // 3. Public folder static assets (fonts, icons, etc.)
+      // -------------------------------------------------------
+      {
+        source: "/fonts/:path*",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=31536000, immutable",
+          },
+        ],
+      },
+
+      // -------------------------------------------------------
+      // 4. API routes — NEVER cache, always private/fresh
+      //    Must be above /:path* catch-all
+      // -------------------------------------------------------
+      {
+        source: "/api/:path*",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "private, no-store, must-revalidate",
+          },
+        ],
+      },
+
+      // -------------------------------------------------------
+      // 5. All HTML pages — Cloudflare caches at edge
+      //    s-maxage: Cloudflare holds for 1 day
+      //    stale-while-revalidate: serve stale instantly,
+      //    revalidate in background — user never waits
+      // -------------------------------------------------------
+      {
+        source: "/:path*",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, s-maxage=86400, stale-while-revalidate=31536000",
+          },
+        ],
+      },
+    ];
+  },
 };
 
 export default withNextIntl(nextConfig);
