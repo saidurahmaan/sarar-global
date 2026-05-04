@@ -27,11 +27,11 @@ async function resolveStoreLocale(): Promise<StoreLocale | null> {
 
   try {
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 1500);
+    const timeout = setTimeout(() => controller.abort(), 3000);
     const response = await fetch(`${baseUrl}/store/public/`, {
       method: "GET",
       headers: { Authorization: `Bearer ${publishableKey}` },
-      cache: "no-store",
+      next: { revalidate: 300 },
       signal: controller.signal,
     }).finally(() => {
       clearTimeout(timeout);
