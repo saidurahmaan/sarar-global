@@ -1,13 +1,38 @@
 /**
  * Post-deploy cache warmer: GETs storefront URLs (sitemap + critical + optional API fallback)
  * so CDN edges pull fresh HTML. Run: npx tsx scripts/warm-cache.ts
+ *
+ * Tuning (each storefront GET can fan out to your API — avoid hammering a small backend):
+ * - WARM_CACHE_CONCURRENCY — max parallel GETs (default 3)
+ * - WARM_CACHE_REQUEST_GAP_MS — optional pause after each GET per worker (default 0)
  */
 
 import { readFileSync, existsSync } from "fs";
 import { resolve } from "path";
 
-const CONCURRENCY = 5;
+const DEFAULT_CONCURRENCY = 3;
+
 const FETCH_TIMEOUT_MS = 30_000;
+
+function warmConcurrency(): number {
+  const raw = process.env.WARM_CACHE_CONCURRENCY?.trim();
+  if (!raw) return DEFAULT_CONCURRENCY;
+  const n = Number.parseInt(raw, 10);
+  if (!Number.isFinite(n) || n < 1) return DEFAULT_CONCURRENCY;
+  return Math.min(n, 16);
+}
+
+function warmRequestGapMs(): number {
+  const raw = process.env.WARM_CACHE_REQUEST_GAP_MS?.trim();
+  if (!raw) return 0;
+  const n = Number.parseInt(raw, 10);
+  if (!Number.isFinite(n) || n < 0) return 0;
+  return Math.min(n, 10_000);
+}
+
+function delay(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
 const LOCALES = ["en", "bn"] as const;
 
 type Paginated<T> = {
@@ -224,7 +249,11 @@ async function warmOne(url: string): Promise<WarmResult> {
   }
 }
 
-async function runPool(urls: string[], concurrency: number): Promise<WarmResult[]> {
+async function runPool(
+  urls: string[],
+  concurrency: number,
+  gapMs: number,
+): Promise<WarmResult[]> {
   const results: WarmResult[] = [];
   let index = 0;
 
@@ -235,6 +264,7 @@ async function runPool(urls: string[], concurrency: number): Promise<WarmResult[
       if (i >= urls.length) return;
       const r = await warmOne(urls[i]!);
       results[i] = r;
+      if (gapMs > 0) await delay(gapMs);
     }
   }
 
@@ -267,8 +297,12 @@ async function main(): Promise<void> {
     );
   }
 
+  const concurrency = warmConcurrency();
+  const gapMs = warmRequestGapMs();
+  console.info(`[warm-cache] concurrency=${concurrency} requestGapMs=${gapMs}`);
+
   const started = performance.now();
-  const results = await runPool(allUrls, CONCURRENCY);
+  const results = await runPool(allUrls, concurrency, gapMs);
   const totalMs = Math.round(performance.now() - started);
 
   const success = results.filter((r) => r.ok).length;
