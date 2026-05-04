@@ -49,7 +49,8 @@ function useDebouncedForSearch(trimmed: string): string {
 }
 
 type StorefrontLiveSearchProps = {
-  mode: "desktop" | "mobile";
+  /** Full-screen overlay field (autofocus). */
+  mode: "desktop" | "mobile" | "headerBar";
   placeholder: string;
   submitAriaLabel: string;
   onAfterNavigate?: () => void;
@@ -69,6 +70,9 @@ export function StorefrontLiveSearch({
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
+    if (mode === "headerBar") {
+      return;
+    }
     // Auto-focus whenever this search UI mounts (mobile drawer or desktop overlay).
     const id = requestAnimationFrame(() => inputRef.current?.focus());
     return () => cancelAnimationFrame(id);
@@ -148,7 +152,7 @@ export function StorefrontLiveSearch({
   }, [panelOpen]);
 
   useEffect(() => {
-    if (!panelOpen || mode !== "desktop") {
+    if (!panelOpen || (mode !== "desktop" && mode !== "headerBar")) {
       return;
     }
 
@@ -178,7 +182,7 @@ export function StorefrontLiveSearch({
 
   const panelClass = cn(
     "live-search-panel-scroll overflow-y-auto rounded-lg border border-border bg-background py-2",
-    mode === "desktop"
+    mode === "desktop" || mode === "headerBar"
       ? "absolute start-0 end-0 top-[calc(100%+0.35rem)] z-[60] max-h-[min(70vh,520px)] shadow-xl ring-1 ring-foreground/5"
       : "mt-3 min-h-0 flex-1 shadow-md",
   );
@@ -186,13 +190,19 @@ export function StorefrontLiveSearch({
   return (
     <div
       ref={rootRef}
-      className={cn("w-full", mode === "desktop" && "relative", mode === "mobile" && "flex min-h-0 flex-1 flex-col")}
+      className={cn(
+        "w-full",
+        (mode === "desktop" || mode === "headerBar") && "relative min-w-0",
+        mode === "mobile" && "flex min-h-0 flex-1 flex-col",
+      )}
     >
       <form
         role="search"
         className={cn(
           "flex w-full items-center rounded-md border border-border bg-background py-1 ps-4 pe-1 shadow-sm",
           mode === "desktop" && "h-10 border-border bg-transparent py-0 pe-2 shadow-none",
+          mode === "headerBar" &&
+            "h-10 min-w-0 w-full overflow-hidden border-header-foreground/20 bg-header-foreground/[0.08] py-0 pe-0 ps-3 shadow-none",
           mode === "mobile" && "relative border-border py-1 pe-2",
         )}
         onSubmit={(e) => {
@@ -218,6 +228,8 @@ export function StorefrontLiveSearch({
           className={cn(
             "min-h-9 min-w-0 flex-1 border-none bg-transparent py-2 text-sm text-foreground outline-none placeholder:text-foreground/45",
             mode === "desktop" && "min-h-0 py-1 text-[12px] placeholder:text-foreground/35",
+            mode === "headerBar" &&
+              "min-h-0 py-2 text-sm text-header-foreground placeholder:text-header-foreground/45 md:text-[15px]",
             mode === "mobile" && "min-h-11 py-2 pe-11 placeholder:text-muted-foreground",
           )}
         />
@@ -228,11 +240,13 @@ export function StorefrontLiveSearch({
             "inline-flex size-9 shrink-0 items-center justify-center rounded-md bg-primary text-primary-foreground transition hover:bg-primary/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary",
             mode === "desktop" &&
               "size-7 rounded-sm bg-transparent text-foreground/55 hover:bg-transparent hover:text-foreground/70 focus-visible:outline-primary",
+            mode === "headerBar" &&
+              "size-auto min-h-10 min-w-11 shrink-0 rounded-none rounded-e-[calc(var(--radius-lg)-2px)] px-4 hover:bg-primary/90",
             mode === "mobile" &&
               "absolute end-2 top-1/2 z-[1] -translate-y-1/2 bg-transparent text-foreground hover:bg-muted focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary",
           )}
         >
-          {(mode === "desktop" || mode === "mobile") && trimmed.length > 0 ? (
+          {(mode === "desktop" || mode === "mobile" || mode === "headerBar") && trimmed.length > 0 ? (
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 24 24"

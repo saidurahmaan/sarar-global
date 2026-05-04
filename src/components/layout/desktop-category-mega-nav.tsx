@@ -142,10 +142,10 @@ export function DesktopCategoryMegaNav({
     >
       <PageContainer>
         <nav
-          className="desktop-category-scroll w-full min-w-0 overflow-x-auto overflow-y-hidden overscroll-x-contain scroll-smooth py-2"
+          className="desktop-category-scroll w-full min-w-0 overflow-x-auto overflow-y-hidden overscroll-x-contain scroll-smooth py-2.5"
           aria-label={ariaLabel}
         >
-          <ul className="flex w-max min-w-full flex-nowrap items-stretch gap-x-1 md:gap-x-2">
+          <ul className="mx-auto flex w-max max-w-full min-w-0 flex-nowrap items-stretch justify-center gap-x-0.5 md:gap-x-1.5">
             {categories.map((category) => {
               const expandable = Boolean(category.children?.length);
               const isOpen = openId === category.id;

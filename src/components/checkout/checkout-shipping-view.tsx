@@ -1,30 +1,38 @@
 "use client";
 
 import Image from "next/image";
+import { Loader2 } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { useCart } from "@/hooks/useCart";
 import { formatPaperbaseError, stockValidationErrors } from "@/lib/api/paperbase-errors";
 import { apiFetchJson } from "@/lib/client/api";
+import { createMfsOrder } from "@/lib/client/checkout-mfs-api";
 import { reconcileCheckoutStock } from "@/lib/client/reconcile-checkout-stock";
 import { formatMoney, parseDecimal } from "@/lib/format";
+import { writeCheckoutSuccessMeta } from "@/lib/checkout/order-success-meta";
 import { resolveStorefrontImageUrl, storefrontImageUnoptimized } from "@/lib/storefront-image";
-import { triggerInitiateCheckout } from "@/lib/tracker";
+import { triggerInitiateCheckout, triggerPurchase } from "@/lib/tracker";
 import { getCheckoutCartItems, useCartStore } from "@/lib/store/cart-store";
 import { cn } from "@/lib/utils";
 import { Link, useRouter, type Locale } from "@/i18n/routing";
 import type { CartItem } from "@/types/cart";
 import type {
   CustomerFormVariant,
+  PaperbaseOrderCreateResponse,
   PaperbaseShippingOption,
   PaperbaseShippingZone,
 } from "@/types/paperbase";
 import type { ProductPrepaymentType } from "@/types/product";
 
+import { readStoredOrder, writeStoredOrder } from "@/components/orders/order-storage-keys";
+
 import {
   CHECKOUT_DRAFT_STORAGE_KEY,
   CHECKOUT_PREPAYMENT_STORAGE_KEY,
+  readMfsPendingOrderPublicId,
+  writeMfsPendingOrderPublicId,
 } from "./checkout-storage-keys";
 
 function resolvePrepayment(items: CartItem[]): ProductPrepaymentType {
@@ -55,6 +63,15 @@ type CheckoutDraft = {
     quantity: number;
     variant_public_id?: string;
   }>;
+};
+
+type CheckoutPaymentMethod = "cod" | "mfs";
+type CheckoutPaymentOption = {
+  id: CheckoutPaymentMethod;
+  title: string;
+  description: string;
+  disabled: boolean;
+  showComingSoon: boolean;
 };
 
 type CheckoutSummaryItemProps = {
@@ -193,8 +210,14 @@ export function CheckoutShippingView({
   const locale = useLocale() as Locale;
   const router = useRouter();
 
-  const { checkoutItems, checkoutSubtotal, hydrated, increment, decrement, removeItem, clearBuyNow } =
-    useCart();
+  const {
+    checkoutItems,
+    checkoutSubtotal,
+    hydrated,
+    increment,
+    decrement,
+    removeItem,
+  } = useCart();
   const [zones, setZones] = useState<Array<{ zone_public_id: string; name: string }>>([]);
   const [selectedZone, setSelectedZone] = useState("");
   const [selectedMethod, setSelectedMethod] = useState("");
@@ -203,6 +226,9 @@ export function CheckoutShippingView({
   const [loading, setLoading] = useState(false);
   const [errorText, setErrorText] = useState<string | null>(null);
   const [stockAdjustedHint, setStockAdjustedHint] = useState<string | null>(null);
+  const [paymentMethod, setPaymentMethod] = useState<CheckoutPaymentMethod>("cod");
+  const [orderLoading, setOrderLoading] = useState(false);
+  const [orderError, setOrderError] = useState<string | null>(null);
   const shippingOptionsCacheRef = useRef(new Map<string, PaperbaseShippingOption[]>());
   const shippingOptionsInFlightRef = useRef(new Map<string, Promise<PaperbaseShippingOption[]>>());
   const hasFiredInitiateRef = useRef(false);
@@ -224,6 +250,16 @@ export function CheckoutShippingView({
         .join("|"),
     [checkoutItems],
   );
+
+  const resolvedPrepayment = useMemo(
+    () => resolvePrepayment(checkoutItems),
+    [checkoutItems],
+  );
+  const requiresPrepayment = resolvedPrepayment !== "none";
+
+  useEffect(() => {
+    setPaymentMethod(requiresPrepayment ? "mfs" : "cod");
+  }, [requiresPrepayment]);
 
   const getShippingOptionsForZone = useCallback(async (zonePublicId: string) => {
     const cached = shippingOptionsCacheRef.current.get(zonePublicId);
@@ -437,7 +473,7 @@ export function CheckoutShippingView({
     [removeItem],
   );
 
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const form = e.currentTarget;
     if (!form.reportValidity()) {
@@ -484,16 +520,113 @@ export function CheckoutShippingView({
       district: district || undefined,
       products: cartItems,
     };
-    window.sessionStorage.setItem(CHECKOUT_DRAFT_STORAGE_KEY, JSON.stringify(draft));
-    // Pin the resolved prepayment for this order BEFORE clearing the Buy Now map,
-    // so the payment step can reflect it even after the transient cart source is gone.
-    window.sessionStorage.setItem(
-      CHECKOUT_PREPAYMENT_STORAGE_KEY,
-      resolvePrepayment(checkoutItems),
-    );
-    // Buy Now session is captured in the draft — release the temporary map
-    clearBuyNow();
-    router.push("/checkout/payment");
+
+    if (paymentMethod === "mfs") {
+      // MFS path — create order and go directly to MFS payment
+      setOrderLoading(true);
+      setOrderError(null);
+      try {
+        window.sessionStorage.setItem(CHECKOUT_DRAFT_STORAGE_KEY, JSON.stringify(draft));
+        window.sessionStorage.setItem(
+          CHECKOUT_PREPAYMENT_STORAGE_KEY,
+          resolvePrepayment(checkoutItems),
+        );
+
+        const pendingId = readMfsPendingOrderPublicId();
+        if (pendingId) {
+          const existing = readStoredOrder(pendingId);
+          const ps = existing?.payment_status ?? "none";
+          if (
+            existing &&
+            existing.requires_payment === true &&
+            ps === "none" &&
+            existing.status === "payment_pending"
+          ) {
+            router.push(`/checkout/payment/mfs?orderId=${encodeURIComponent(pendingId)}`);
+            return;
+          }
+        }
+
+        const order = await createMfsOrder(draft);
+        window.sessionStorage.removeItem(CHECKOUT_DRAFT_STORAGE_KEY);
+        window.sessionStorage.removeItem(CHECKOUT_PREPAYMENT_STORAGE_KEY);
+
+        if (order.requires_payment !== true) {
+          writeStoredOrder(order);
+          writeCheckoutSuccessMeta(order.public_id, { payment_method: "mfs" });
+          triggerPurchase({
+            order_id: order.public_id,
+            value: Number(order.total),
+            items: order.items.map((line) => ({
+              id: line.product_name,
+              quantity: line.quantity,
+              item_price: Number(line.unit_price),
+            })),
+            customer: {
+              email: draft.email || "",
+              phone: draft.phone || "",
+              first_name: draft.shipping_name.split(" ")[0] || "",
+              last_name: draft.shipping_name.split(" ").slice(1).join(" ") || "",
+              city: draft.district || "",
+            },
+          });
+          useCartStore.getState().clear();
+          router.replace(`/success/${order.public_id}`);
+          return;
+        }
+
+        writeStoredOrder(order);
+        writeMfsPendingOrderPublicId(order.public_id);
+        useCartStore.getState().clear();
+        router.push(`/checkout/payment/mfs?orderId=${encodeURIComponent(order.public_id)}`);
+      } catch (error) {
+        const stockErrors = stockValidationErrors(error);
+        setOrderError(
+          stockErrors.length ? stockErrors.join(" | ") : formatPaperbaseError(error),
+        );
+      } finally {
+        setOrderLoading(false);
+      }
+      return;
+    }
+
+    setOrderLoading(true);
+    setOrderError(null);
+    try {
+      const order = await apiFetchJson<PaperbaseOrderCreateResponse>("/checkout/order", {
+        method: "POST",
+        body: JSON.stringify({ ...draft, payment_method: "cod" }),
+      });
+      window.sessionStorage.removeItem(CHECKOUT_DRAFT_STORAGE_KEY);
+      window.sessionStorage.removeItem(CHECKOUT_PREPAYMENT_STORAGE_KEY);
+      writeStoredOrder(order);
+      writeCheckoutSuccessMeta(order.public_id, { payment_method: "cod" });
+      triggerPurchase({
+        order_id: order.public_id,
+        value: Number(order.total),
+        items: order.items.map((line) => ({
+          id: line.product_name,
+          quantity: line.quantity,
+          item_price: Number(line.unit_price),
+        })),
+        customer: {
+          email: draft.email || "",
+          phone: draft.phone || "",
+          first_name: draft.shipping_name.split(" ")[0] || "",
+          last_name: draft.shipping_name.split(" ").slice(1).join(" ") || "",
+          city: draft.district || "",
+        },
+      });
+      useCartStore.getState().clear();
+      router.replace(`/success/${order.public_id}`);
+    } catch (error) {
+      const stockErrors = stockValidationErrors(error);
+      setOrderError(
+        stockErrors.length ? stockErrors.join(" | ") : formatPaperbaseError(error),
+      );
+    } finally {
+      setOrderLoading(false);
+    }
   }
 
   if (!hydrated) {
@@ -545,7 +678,9 @@ export function CheckoutShippingView({
       <CheckoutBreadcrumbs step="shipping" />
 
       <form
-        onSubmit={handleSubmit}
+        onSubmit={(e) => {
+          void handleSubmit(e);
+        }}
         className="mx-auto grid w-full min-w-0 max-w-5xl gap-6 lg:grid-cols-2 lg:items-stretch lg:gap-8"
       >
         <div className="lg:relative">
@@ -803,6 +938,93 @@ export function CheckoutShippingView({
               </fieldset>
             </section>
 
+            <section className={cn("shrink-0", shellCard, "p-5 sm:p-6")}>
+              <h2 className="text-base font-semibold text-foreground">{t("paymentMethodSection")}</h2>
+              <fieldset className="mt-4 grid gap-3">
+                <legend className="sr-only">{t("paymentMethodSection")}</legend>
+                {(() => {
+                  const options: CheckoutPaymentOption[] = [
+                    {
+                      id: "cod",
+                      title: t("paymentCodTitle"),
+                      description: requiresPrepayment
+                        ? t("paymentCodDisabledPrepayment")
+                        : t("paymentCodDescription"),
+                      disabled: requiresPrepayment,
+                      showComingSoon: false,
+                    },
+                  ];
+                  if (requiresPrepayment) {
+                    options.push({
+                      id: "mfs",
+                      title: t("paymentMfsTitle"),
+                      description:
+                        resolvedPrepayment === "full"
+                          ? t("paymentMfsPrepayFullDescription")
+                          : t("paymentMfsPrepayDeliveryDescription"),
+                      disabled: false,
+                      showComingSoon: false,
+                    });
+                  }
+                  return options.map((option) => {
+                    const disabled = option.disabled;
+                    const selected = !disabled && paymentMethod === option.id;
+                    return (
+                      <label
+                        key={option.id}
+                        className={cn(
+                          "flex items-start gap-3 rounded-lg border p-4 transition-colors",
+                          disabled
+                            ? "cursor-not-allowed border-border bg-background/90 opacity-90"
+                            : cn(
+                                "cursor-pointer",
+                                selected
+                                  ? "border-border bg-primary/10"
+                                  : "border-border bg-card hover:border-border",
+                              ),
+                        )}
+                      >
+                        <input
+                          type="radio"
+                          name="paymentMethod"
+                          value={option.id}
+                          disabled={disabled}
+                          checked={selected}
+                          onChange={() => {
+                            if (!disabled) {
+                              setPaymentMethod(option.id);
+                            }
+                          }}
+                          className={cn(
+                            "mt-0.5 size-4 shrink-0 accent-primary",
+                            disabled && "cursor-not-allowed opacity-60",
+                          )}
+                        />
+                        <span className="min-w-0 text-start">
+                          <span className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                            <span className="text-sm font-medium text-foreground">{option.title}</span>
+                            {option.showComingSoon ? (
+                              <span className="inline-flex shrink-0 rounded-md bg-muted/90 px-2 py-0.5 text-xs font-medium text-muted-foreground">
+                                {t("paymentMfsComingSoon")}
+                              </span>
+                            ) : null}
+                            {requiresPrepayment && option.id === "mfs" ? (
+                              <span className="inline-flex shrink-0 rounded-md bg-accent/20 px-2 py-0.5 text-xs font-semibold text-accent-foreground">
+                                {t("paymentMfsPrepayBadge")}
+                              </span>
+                            ) : null}
+                          </span>
+                          <span className="mt-0.5 block text-sm text-muted-foreground">
+                            {option.description}
+                          </span>
+                        </span>
+                      </label>
+                    );
+                  });
+                })()}
+              </fieldset>
+            </section>
+
             <div
               className={cn(
                 shellCard,
@@ -817,12 +1039,23 @@ export function CheckoutShippingView({
             ) : null}
             {errorText ? <p className="shrink-0 text-sm text-danger">{errorText}</p> : null}
 
+            {orderError ? <p className="shrink-0 text-sm text-danger">{orderError}</p> : null}
+
             <button
               type="submit"
-              disabled={loading}
-              className="flex h-12 w-full shrink-0 items-center justify-center rounded-lg bg-primary text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-50"
+              disabled={loading || orderLoading}
+              className="flex h-12 w-full shrink-0 items-center justify-center gap-2 rounded-lg bg-primary text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-50"
             >
-              {t("continueToPayment")}
+              {orderLoading ? (
+                <>
+                  <Loader2 className="size-5 shrink-0 animate-spin" strokeWidth={2.25} aria-hidden />
+                  <span>{t("placingOrder")}</span>
+                </>
+              ) : paymentMethod === "mfs" ? (
+                t("continueToPayment")
+              ) : (
+                t("placeOrder")
+              )}
             </button>
           </div>
         </div>

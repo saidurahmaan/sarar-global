@@ -12,6 +12,7 @@ import { Footer } from "@/components/layout/footer";
 import { Navbar } from "@/components/layout/navbar";
 import { StorefrontRuntimeBoot } from "@/components/paperbase/storefront-runtime-boot";
 import { routing, type Locale } from "@/i18n/routing";
+import { DOCUMENT_METADATA_LOCALE } from "@/lib/document-metadata-locale";
 import { getServerPaperbaseConfig } from "@/lib/server/config";
 import { getActivePopup } from "@/lib/server/paperbase";
 import { getTrackerScriptSrc } from "@/lib/server/tracking";
@@ -52,8 +53,7 @@ export async function generateMetadata({
   }
 
   const store = await getStorefrontStorePublic();
-  const activeLocale: Locale = store.language === "bn" ? "bn" : "en";
-  const t = await getTranslations({ locale: activeLocale, namespace: "metadata" });
+  const t = await getTranslations({ locale: DOCUMENT_METADATA_LOCALE, namespace: "metadata" });
 
   return {
     title: store.seo.default_title || store.store_name || t("title"),

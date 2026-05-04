@@ -1,3 +1,5 @@
+import { getTranslations } from "next-intl/server";
+
 import {
   getActiveNotifications,
   getBanners,
@@ -5,6 +7,7 @@ import {
   listCategories,
 } from "@/lib/server/paperbase";
 import { categoryDisplayName } from "@/lib/category-display";
+import { DOCUMENT_METADATA_LOCALE } from "@/lib/document-metadata-locale";
 import type { PaperbaseBannerSlot, PaperbaseCategoryTreeNode } from "@/types/paperbase";
 
 export type HeaderCategoryNav = {
@@ -28,6 +31,15 @@ function mapCategoryNode(node: PaperbaseCategoryTreeNode): HeaderCategoryNav {
 
 export async function getStorefrontStorePublic() {
   return getStorePublic();
+}
+
+/** Store name for `<title>` suffixes; falls back to English metadata string if API name is empty. */
+export async function resolveStorefrontDocumentBrand(): Promise<string> {
+  const store = await getStorePublic();
+  const name = store.store_name?.trim();
+  if (name) return name;
+  const t = await getTranslations({ locale: DOCUMENT_METADATA_LOCALE, namespace: "metadata" });
+  return t("fallbackStoreName");
 }
 
 export async function getStorefrontHeaderCategories() {

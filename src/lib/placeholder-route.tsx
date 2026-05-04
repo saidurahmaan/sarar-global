@@ -3,7 +3,9 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 
 import { PlaceholderPageShell } from "@/components/layout/placeholder-page-shell";
+import { DOCUMENT_METADATA_LOCALE } from "@/lib/document-metadata-locale";
 import { routing, type Locale } from "@/i18n/routing";
+import { resolveStorefrontDocumentBrand } from "@/lib/storefront";
 
 export type PlaceholderTitleKey =
   | "account"
@@ -21,11 +23,13 @@ export async function placeholderMetadata(locale: string, titleKey: PlaceholderT
     return {};
   }
 
-  const t = await getTranslations({ locale, namespace: "placeholderPages" });
-  const common = await getTranslations({ locale, namespace: "common" });
+  const [t, brand] = await Promise.all([
+    getTranslations({ locale: DOCUMENT_METADATA_LOCALE, namespace: "placeholderPages" }),
+    resolveStorefrontDocumentBrand(),
+  ]);
 
   return {
-    title: `${t(`titles.${titleKey}`)} - ${common("brand")}`,
+    title: `${t(`titles.${titleKey}`)} - ${brand}`,
     description: t("message"),
   };
 }

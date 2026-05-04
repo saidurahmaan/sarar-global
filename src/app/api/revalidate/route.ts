@@ -2,8 +2,6 @@ import { timingSafeEqual } from "crypto";
 import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
 
-import { purgeCloudflarePrefixes, purgeCloudflareUrls } from "@/lib/server/cloudflare-purge";
-
 const LOCALES = ["en", "bn"] as const;
 
 const WEBHOOK_ENTITY_TYPES = [
@@ -28,7 +26,6 @@ type WebhookPayload = {
 type RevalidationResult = {
   revalidatedPaths: string[];
   purgePaths: string[];
-  /** Full origin URLs for Cloudflare prefix purge (e.g. bust all cached product HTML). */
   purgePrefixes: string[];
 };
 
@@ -65,18 +62,6 @@ function timingSafeSecretMatch(expected: string, received: string | null): boole
     return false;
   }
   return timingSafeEqual(a, b);
-}
-
-function normalizeSiteBase(): string | null {
-  const raw = process.env.NEXT_PUBLIC_SITE_URL?.trim();
-  if (!raw) return null;
-  return raw.replace(/\/+$/, "");
-}
-
-function absoluteUrls(pathSuffixes: string[]): string[] {
-  const base = normalizeSiteBase();
-  if (!base) return [];
-  return pathSuffixes.map((p) => `${base}${p.startsWith("/") ? "" : "/"}${p}`);
 }
 
 function revalidateProduct(slug: string): RevalidationResult {
@@ -155,15 +140,9 @@ function revalidateStore(): RevalidationResult {
   const revalidatedPaths = ["/ (root layout)"];
   const purgePaths: string[] = [];
   const purgePrefixes: string[] = [];
-  const base = normalizeSiteBase();
   for (const loc of LOCALES) {
     const home = `/${loc}`;
     purgePaths.push(home);
-    if (base) {
-      purgePrefixes.push(`${base}/${loc}/products`);
-      purgePrefixes.push(`${base}/${loc}/categories`);
-      purgePrefixes.push(`${base}/${loc}/search`);
-    }
   }
   return { revalidatedPaths, purgePaths, purgePrefixes };
 }
@@ -251,46 +230,13 @@ export async function POST(request: Request): Promise<NextResponse> {
   }
 
   try {
-    const { revalidatedPaths, purgePaths, purgePrefixes } = runRevalidation(payload);
-
-    const base = normalizeSiteBase();
-    if (!base) {
-      console.warn("[revalidate] skipped_cloudflare_purge_missing_NEXT_PUBLIC_SITE_URL", {
-        store_public_id: payload.store_public_id,
-        event: payload.event,
-        type: payload.type,
-      });
-    }
-
-    const purgeUrls = absoluteUrls(purgePaths);
-
-    void purgeCloudflarePrefixes(purgePrefixes).then(() => {
-      console.info("[revalidate] cloudflare_prefix_purge_finished", {
-        store_public_id: payload.store_public_id,
-        event: payload.event,
-        type: payload.type,
-        prefixCount: purgePrefixes.length,
-        cloudflareConfigured: Boolean(
-          base && purgePrefixes.length > 0 && process.env.CF_ZONE_ID && process.env.CF_API_TOKEN,
-        ),
-      });
-    });
+    const { revalidatedPaths } = runRevalidation(payload);
 
     console.info("[revalidate] revalidated", {
       store_public_id: payload.store_public_id,
       event: payload.event,
       type: payload.type,
       paths: revalidatedPaths,
-    });
-
-    void purgeCloudflareUrls(purgeUrls).then(() => {
-      console.info("[revalidate] cloudflare_purge_finished", {
-        store_public_id: payload.store_public_id,
-        event: payload.event,
-        type: payload.type,
-        purgeUrlCount: purgeUrls.length,
-        cloudflareConfigured: Boolean(base && purgeUrls.length > 0),
-      });
     });
 
     return NextResponse.json({

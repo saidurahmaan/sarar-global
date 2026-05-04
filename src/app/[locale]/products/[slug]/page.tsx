@@ -15,6 +15,7 @@ import { categoryDisplayName } from "@/lib/category-display";
 import { formatMoney, parseDecimal } from "@/lib/format";
 import { buildProductGalleryImageUrls } from "@/lib/product-gallery";
 import { buildProductExtraDetailLines, splitProductDescriptionBullets } from "@/lib/product-extra-fields";
+import { DOCUMENT_METADATA_LOCALE } from "@/lib/document-metadata-locale";
 import {
   getStorefrontProductDetail,
   getStorefrontProductSlugs,
@@ -39,7 +40,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const [product, store, tMeta] = await Promise.all([
     getStorefrontProductDetail(slug),
     getStorefrontStorePublic(),
-    getTranslations({ locale, namespace: "metadata" }),
+    getTranslations({ locale: DOCUMENT_METADATA_LOCALE, namespace: "metadata" }),
   ]);
   if (!product) {
     return {};

@@ -21,6 +21,7 @@ import {
   resolvePostTags,
 } from "@/lib/blog-data";
 import { formatBlogDateCompact } from "@/lib/blog-format";
+import { resolveStorefrontDocumentBrand } from "@/lib/storefront";
 
 type PageProps = {
   params: Promise<{ locale: string; slug: string }>;
@@ -42,10 +43,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     return {};
   }
 
-  const common = await getTranslations({ locale, namespace: "common" });
+  const brand = await resolveStorefrontDocumentBrand();
 
   return {
-    title: `${post.title} - ${common("brand")}`,
+    title: `${post.title} - ${brand}`,
     description: post.excerpt,
   };
 }

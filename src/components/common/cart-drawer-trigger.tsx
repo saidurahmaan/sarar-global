@@ -1,6 +1,6 @@
 "use client";
 
-import { Handbag, ArrowUp } from "lucide-react";
+import { ArrowUp, Handbag } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 
@@ -25,16 +25,17 @@ export function CartTrigger({ variant }: CartTriggerProps) {
       className={
         variant === "mobile"
           ? "h-10 w-10 shrink-0 cursor-pointer border-0 bg-transparent p-0 text-header-foreground transition-transform duration-150 hover:scale-[1.06] hover:bg-transparent active:bg-transparent md:hidden [&_svg]:text-header-foreground"
-          : "cursor-pointer border-0 bg-transparent p-2 text-header-foreground transition-transform duration-150 hover:scale-[1.06] hover:bg-transparent active:bg-transparent [&_svg]:text-header-foreground"
+          : "hidden h-9 cursor-pointer gap-2 rounded-lg border border-header-foreground/20 bg-transparent px-3 text-sm font-medium text-header-foreground transition-colors hover:bg-header-foreground/[0.06] hover:text-header-foreground active:bg-transparent md:inline-flex [&_svg]:text-header-foreground"
       }
     >
-      <Link href="/cart">
+      <Link href="/cart" className="inline-flex items-center gap-2">
         <span className="relative inline-flex">
-          <Handbag className="size-[26px] shrink-0" strokeWidth={1.75} aria-hidden />
+          <Handbag className="size-[20px] shrink-0" strokeWidth={1.75} aria-hidden />
           <span className="absolute -bottom-0.5 -right-0.5 flex h-[18px] min-w-[18px] translate-x-px translate-y-px items-center justify-center rounded-full bg-accent px-1 text-[10px] font-semibold leading-none text-accent-foreground tabular-nums">
             {itemCount > 99 ? "99+" : itemCount}
           </span>
         </span>
+        <span className="hidden lg:inline">{t("myCart")}</span>
       </Link>
     </Button>
   );

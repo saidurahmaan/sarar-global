@@ -8,8 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "lint:theme": "eslint src/ --rule '{\"local-rules/no-hardcoded-colors\": \"warn\"}'",
-    "lint:theme:strict": "eslint src/ --rule '{\"local-rules/no-hardcoded-colors\": \"error\"}'",
-    "warm-cache": "npx tsx scripts/warm-cache.ts"
+    "lint:theme:strict": "eslint src/ --rule '{\"local-rules/no-hardcoded-colors\": \"error\"}'"
   },
   "dependencies": {
     "aos": "^2.3.4",

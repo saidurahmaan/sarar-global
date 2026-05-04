@@ -7,6 +7,8 @@ import { BlogListing } from "@/components/blog/blog-listing";
 import { PageContainer } from "@/components/layout/page-container";
 import { routing, type Locale } from "@/i18n/routing";
 import { getAllPosts } from "@/lib/blog-data";
+import { DOCUMENT_METADATA_LOCALE } from "@/lib/document-metadata-locale";
+import { resolveStorefrontDocumentBrand } from "@/lib/storefront";
 
 type PageProps = {
   params: Promise<{ locale: string }>;
@@ -18,13 +20,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     return {};
   }
 
-  const [t, common] = await Promise.all([
-    getTranslations({ locale, namespace: "blog" }),
-    getTranslations({ locale, namespace: "common" }),
+  const [t, brand] = await Promise.all([
+    getTranslations({ locale: DOCUMENT_METADATA_LOCALE, namespace: "blog" }),
+    resolveStorefrontDocumentBrand(),
   ]);
 
   return {
-    title: `${t("metaTitle")} - ${common("brand")}`,
+    title: `${t("metaTitle")} - ${brand}`,
     description: t("metaDescription"),
   };
 }

@@ -202,7 +202,7 @@ export function MobileNavDrawer({
       <button
         ref={triggerRef}
         type="button"
-        className="flex size-10 shrink-0 items-center justify-start ps-0.5 self-center rounded-md text-header-foreground md:hidden hover:bg-header-foreground/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-header-foreground/80"
+        className="inline-flex h-10 w-10 shrink-0 appearance-none items-center justify-start border-0 bg-transparent p-0 text-header-foreground md:hidden hover:bg-header-foreground/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-header-foreground/80 self-center rounded-md"
         aria-label={open ? tNav("closeMenu") : menuTitle}
         aria-expanded={open}
         aria-controls={panelId}

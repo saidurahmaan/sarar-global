@@ -20,10 +20,11 @@ export function AccountNavLink({ variant }: AccountNavLinkProps) {
       className={
         variant === "mobile"
           ? "inline-flex h-10 w-10 shrink-0 items-center justify-center border-0 bg-transparent p-0 text-header-foreground transition-transform duration-150 hover:scale-[1.06] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-header-foreground/80 md:hidden"
-          : "inline-flex items-center justify-center border-0 bg-transparent p-2 text-header-foreground transition-transform duration-150 hover:scale-[1.06] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-header-foreground/80"
+          : "hidden h-9 items-center gap-2 rounded-lg border border-header-foreground/20 bg-transparent px-3 text-sm font-medium text-header-foreground transition-colors hover:bg-header-foreground/[0.06] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-header-foreground/40 md:inline-flex"
       }
     >
-      <CircleUser className="size-[26px] shrink-0" strokeWidth={1.75} aria-hidden />
+      <CircleUser className="size-[20px] shrink-0" strokeWidth={1.75} aria-hidden />
+      <span className="hidden lg:inline">{t("signIn")}</span>
     </Link>
   );
 

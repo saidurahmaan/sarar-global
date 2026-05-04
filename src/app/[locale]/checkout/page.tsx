@@ -4,8 +4,9 @@ import { notFound } from "next/navigation";
 
 import { CheckoutShippingView } from "@/components/checkout/checkout-shipping-view";
 import { PageContainer } from "@/components/layout/page-container";
+import { DOCUMENT_METADATA_LOCALE } from "@/lib/document-metadata-locale";
 import { routing, type Locale } from "@/i18n/routing";
-import { getStorefrontStorePublic } from "@/lib/storefront";
+import { getStorefrontStorePublic, resolveStorefrontDocumentBrand } from "@/lib/storefront";
 import type { CustomerFormVariant } from "@/types/paperbase";
 
 type PageProps = {
@@ -18,10 +19,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     return {};
   }
 
-  const t = await getTranslations({ locale, namespace: "checkout" });
+  const [t, brand] = await Promise.all([
+    getTranslations({ locale: DOCUMENT_METADATA_LOCALE, namespace: "checkout" }),
+    resolveStorefrontDocumentBrand(),
+  ]);
 
   return {
-    title: t("metaTitle"),
+    title: `${t("metaTitle")} - ${brand}`,
     description: t("metaDescription"),
   };
 }

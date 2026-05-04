@@ -5,14 +5,18 @@ import { getLocale, getTranslations, setRequestLocale } from "next-intl/server";
 import { PageContainer } from "@/components/layout/page-container";
 import { buttonVariants } from "@/components/ui/button";
 import { Link } from "@/i18n/routing";
+import { DOCUMENT_METADATA_LOCALE } from "@/lib/document-metadata-locale";
 import type { Locale } from "@/i18n/routing";
+import { resolveStorefrontDocumentBrand } from "@/lib/storefront";
 import { cn } from "@/lib/utils";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const locale = (await getLocale()) as Locale;
-  const t = await getTranslations({ locale, namespace: "states" });
+  const [t, brand] = await Promise.all([
+    getTranslations({ locale: DOCUMENT_METADATA_LOCALE, namespace: "states" }),
+    resolveStorefrontDocumentBrand(),
+  ]);
   return {
-    title: t("notFoundMetaTitle"),
+    title: `${t("notFoundMetaTitle")} - ${brand}`,
     description: t("notFoundMetaDescription"),
   };
 }

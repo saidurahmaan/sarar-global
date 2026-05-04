@@ -4,7 +4,9 @@ import { notFound } from "next/navigation";
 
 import { OrderPaymentView } from "@/components/orders/order-payment-view";
 import { PageContainer } from "@/components/layout/page-container";
+import { DOCUMENT_METADATA_LOCALE } from "@/lib/document-metadata-locale";
 import { routing, type Locale } from "@/i18n/routing";
+import { resolveStorefrontDocumentBrand } from "@/lib/storefront";
 
 type PageProps = {
   params: Promise<{ locale: string; publicId: string }>;
@@ -16,10 +18,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     return {};
   }
 
-  const t = await getTranslations({ locale, namespace: "orderPayment" });
+  const [t, brand] = await Promise.all([
+    getTranslations({ locale: DOCUMENT_METADATA_LOCALE, namespace: "orderPayment" }),
+    resolveStorefrontDocumentBrand(),
+  ]);
 
   return {
-    title: t("metaTitle"),
+    title: `${t("metaTitle")} - ${brand}`,
     description: t("metaDescription"),
   };
 }

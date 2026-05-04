@@ -4,7 +4,9 @@ import { notFound } from "next/navigation";
 
 import { CheckoutSuccessPageClient } from "@/components/checkout/checkout-success-page-client";
 import { PageContainer } from "@/components/layout/page-container";
+import { DOCUMENT_METADATA_LOCALE } from "@/lib/document-metadata-locale";
 import { routing, type Locale } from "@/i18n/routing";
+import { resolveStorefrontDocumentBrand } from "@/lib/storefront";
 
 type PageProps = {
   params: Promise<{ locale: string; orderId: string }>;
@@ -15,9 +17,12 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   if (!routing.locales.includes(locale as Locale)) {
     return {};
   }
-  const t = await getTranslations({ locale, namespace: "checkout" });
+  const [t, brand] = await Promise.all([
+    getTranslations({ locale: DOCUMENT_METADATA_LOCALE, namespace: "checkout" }),
+    resolveStorefrontDocumentBrand(),
+  ]);
   return {
-    title: t("orderSuccessMetaTitle"),
+    title: `${t("orderSuccessMetaTitle")} - ${brand}`,
     description: t("orderSuccessMetaDescription"),
   };
 }

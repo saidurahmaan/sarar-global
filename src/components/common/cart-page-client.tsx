@@ -29,7 +29,7 @@ export function CartPageClient() {
   return (
     <div className="bg-card">
       <div className="flex items-baseline justify-between gap-4 border-b border-border pb-6">
-        <h1 className="text-3xl font-thin tracking-tight text-foreground md:text-4xl">{t("title")}</h1>
+        <h1 className="text-3xl font-normal tracking-tight text-foreground md:text-4xl">{t("title")}</h1>
         <Link
           href="/#products"
           className="text-sm font-medium text-muted-foreground underline decoration-muted-foreground underline-offset-4 hover:text-foreground"
