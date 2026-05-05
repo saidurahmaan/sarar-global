@@ -10,6 +10,7 @@ jobs:
     strategy:
       matrix:
         fork:
+          - apbrandstore/ap-brand-store
           - saidurahmaan/sarar-global
           - mdshakil05382/sajwear
     steps:
