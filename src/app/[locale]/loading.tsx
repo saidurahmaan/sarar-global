@@ -1,7 +1,13 @@
 import { Loader2 } from "lucide-react";
-import { getTranslations } from "next-intl/server";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 
-export default async function Loading() {
+export default async function Loading({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  setRequestLocale(locale);
   const t = await getTranslations("states");
 
   return (
@@ -11,7 +17,11 @@ export default async function Loading() {
       aria-live="polite"
       aria-busy="true"
     >
-      <Loader2 className="size-11 shrink-0 animate-spin text-primary" strokeWidth={2} aria-hidden />
+      <Loader2
+        className="size-11 shrink-0 animate-spin text-primary"
+        strokeWidth={2}
+        aria-hidden
+      />
       <span className="sr-only">{t("loading")}</span>
     </div>
   );

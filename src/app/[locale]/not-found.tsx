@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Home } from "lucide-react";
-import { getLocale, getTranslations, setRequestLocale } from "next-intl/server";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 
 import { PageContainer } from "@/components/layout/page-container";
 import { buttonVariants } from "@/components/ui/button";
@@ -21,8 +21,13 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export default async function NotFoundPage() {
-  const locale = (await getLocale()) as Locale;
+export default async function NotFoundPage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale: rawLocale } = await params;
+  const locale = rawLocale as Locale;
   setRequestLocale(locale);
 
   const t = await getTranslations({ locale, namespace: "states" });

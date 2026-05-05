@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { getLocale, getTranslations } from "next-intl/server";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 
 import { StorefrontProductCard } from "@/components/common/StorefrontProductCard";
 import { PageContainer } from "@/components/layout/page-container";
@@ -62,13 +62,19 @@ function FullBleedBannerBlock({
   );
 }
 
-export default async function HomePage() {
-  const [tHome, categorySections, homeTopBanners, homeBottomBanners, locale] = await Promise.all([
+export default async function HomePage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  setRequestLocale(locale);
+  
+  const [tHome, categorySections, homeTopBanners, homeBottomBanners] = await Promise.all([
     getTranslations("home"),
     getStorefrontHomeCategorySections(),
     getStorefrontBanners("home_top"),
     getStorefrontBanners("home_bottom"),
-    getLocale(),
   ]);
 
   const heroBanner = homeTopBanners.find((banner) => bannerHasAnyImage(banner)) ?? null;

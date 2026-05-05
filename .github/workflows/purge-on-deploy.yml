@@ -1,0 +1,22 @@
+# Required GitHub Secrets:
+# - CF_ZONE_ID    → Cloudflare zone ID
+# - CF_API_TOKEN  → Cloudflare API token with Cache Purge permission
+name: Purge Cloudflare Cache After Deploy
+on:
+  deployment_status:
+jobs:
+  purge:
+    if: |
+      github.event.deployment_status.state == 'success' &&
+      github.event.deployment_status.environment == 'Production'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Purge Cloudflare Cache
+        run: |
+          curl -s -X POST \
+            "https://api.cloudflare.com/client/v4/zones/${{ secrets.CF_ZONE_ID }}/purge_cache" \
+            -H "Authorization: Bearer ${{ secrets.CF_API_TOKEN }}" \
+            -H "Content-Type: application/json" \
+            -d '{"purge_everything":true}' | jq .
+

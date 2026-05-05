@@ -2,6 +2,8 @@ import { timingSafeEqual } from "crypto";
 import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
 
+import { purgeCloudflareUrls } from "@/lib/server/cloudflare-purge";
+
 const LOCALES = ["en", "bn"] as const;
 
 const WEBHOOK_ENTITY_TYPES = [
@@ -28,6 +30,18 @@ type RevalidationResult = {
   purgePaths: string[];
   purgePrefixes: string[];
 };
+
+function normalizeSiteBase(): string | null {
+  const raw = process.env.NEXT_PUBLIC_SITE_URL?.trim();
+  if (!raw) return null;
+  return raw.replace(/\/+$/, "");
+}
+
+function absoluteUrls(pathSuffixes: string[]): string[] {
+  const base = normalizeSiteBase();
+  if (!base) return [];
+  return pathSuffixes.map((p) => `${base}${p.startsWith("/") ? "" : "/"}${p}`);
+}
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -230,7 +244,17 @@ export async function POST(request: Request): Promise<NextResponse> {
   }
 
   try {
-    const { revalidatedPaths } = runRevalidation(payload);
+    const { revalidatedPaths, purgePaths } = runRevalidation(payload);
+    const purgeUrls = absoluteUrls(purgePaths);
+
+    void purgeCloudflareUrls(purgeUrls).then(() => {
+      console.info("[revalidate] cloudflare_purge_finished", {
+        store_public_id: payload.store_public_id,
+        event: payload.event,
+        type: payload.type,
+        purgeUrlCount: purgeUrls.length,
+      });
+    });
 
     console.info("[revalidate] revalidated", {
       store_public_id: payload.store_public_id,
