@@ -100,8 +100,13 @@ export async function Footer() {
     },
   ].filter((item) => Boolean(item.href?.trim()));
 
+  const storeDisplayName = store.store_name?.trim() || common("brand");
+
   return (
-    <footer className="border-t border-white/10 bg-primary pt-10 pb-8 text-primary-foreground">
+    <footer
+      className="border-t border-white/10 bg-primary pt-10 pb-8 text-primary-foreground"
+      title={`${storeDisplayName} powered by Paperbase`}
+    >
       <PageContainer>
         <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-4 lg:gap-12">
           <div>
@@ -236,7 +241,7 @@ export async function Footer() {
         </div>
 
         <p className="mt-12 text-center text-sm text-primary-foreground/60">
-          © <FooterYear />, {store.store_name || common("brand")}
+          © <FooterYear />, {storeDisplayName}
         </p>
       </PageContainer>
     </footer>
