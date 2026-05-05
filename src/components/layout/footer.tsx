@@ -1,6 +1,7 @@
 import { MapPin, Mail, Phone } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 
+import { FooterYear } from "@/components/layout/footer-year";
 import { PageContainer } from "@/components/layout/page-container";
 import { Link } from "@/i18n/routing";
 import { getStorefrontStorePublic } from "@/lib/storefront";
@@ -68,7 +69,6 @@ export async function Footer() {
     getTranslations("common"),
     getStorefrontStorePublic(),
   ]);
-  const year = new Date().getFullYear();
 
   const socialClass =
     "flex size-11 items-center justify-center rounded-md border border-primary-foreground/15 bg-primary-foreground/5 text-primary-foreground transition-colors hover:border-accent/50 hover:bg-primary-foreground/10 hover:opacity-70";
@@ -236,7 +236,7 @@ export async function Footer() {
         </div>
 
         <p className="mt-12 text-center text-sm text-primary-foreground/60">
-          © {year}, {store.store_name || common("brand")}
+          © <FooterYear />, {store.store_name || common("brand")}
         </p>
       </PageContainer>
     </footer>
